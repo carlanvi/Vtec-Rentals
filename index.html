@@ -482,127 +482,55 @@
     }
 
     function loadGallery(containerId) {
-      const galleryContainer = document.getElementById(containerId);
-      galleryContainer.innerHTML = '';
+  const galleryContainer = document.getElementById(containerId);
+  galleryContainer.innerHTML = '';
 
-      db.collection('gallery').onSnapshot((querySnapshot) => {
-        galleryContainer.innerHTML = '';
+  db.collection('gallery').onSnapshot((querySnapshot) => {
+    galleryContainer.innerHTML = '';
 
-        const categories = {};
+    const categories = {};
 
-        querySnapshot.forEach((doc) => {
-          const data = doc.data();
-          const imageUrl = data.url;
-          const name = data.name || 'Unnamed';
-          const price = data.price || 0;
-          const category = data.category || 'Uncategorized';
+    querySnapshot.forEach((doc) => {
+      const data = doc.data();
+      const imageUrl = data.url;
+      const name = data.name || 'Unnamed';
+      const price = data.price || 0;
+      const category = data.category || 'Uncategorized';
 
-          if (!categories[category]) {
-            categories[category] = [];
-          }
-          categories[category].push({ imageUrl, name, price });
-        });
+      if (!categories[category]) {
+        categories[category] = [];
+      }
+      categories[category].push({ imageUrl, name, price });
+    });
 
-        for (const category in categories) {
-          galleryContainer.innerHTML += `
-            <div class="gallery-category">
-              <h3>${category}</h3>
-              <div class="gallery-wrapper">
-                <div class="gallery-grid" id="gallery-${category}"></div>
-              </div>
+    for (const category in categories) {
+      galleryContainer.innerHTML += `
+        <div class="gallery-category">
+          <h3>${category}</h3>
+          <div class="gallery-wrapper">
+            <div class="gallery-grid" id="gallery-${category}"></div>
+          </div>
+        </div>
+      `;
+
+      const categoryContainer = document.getElementById(`gallery-${category}`);
+      categories[category].forEach((item) => {
+        categoryContainer.innerHTML += `
+          <div class="product-card">
+            <img src="${item.imageUrl}" alt="${item.name}">
+            <div class="product-info">
+              <div class="product-name">${item.name}</div>
+              <div class="product-price">$${item.price.toFixed(2)}</div>
+              <a href="https://wa.me/YOURNUMBER?text=Hi, I'm interested in booking: ${encodeURIComponent(item.name)}" target="_blank">
+                <button style="background-color:#28a745;color:white;border:none;padding:6px 12px;border-radius:4px;cursor:pointer;font-weight:bold;">Book Now</button>
+              </a>
             </div>
-          `;
-
-          const categoryContainer = document.getElementById(`gallery-${category}`);
-          categories[category].forEach((item) => {
-            categoryContainer.innerHTML += `
-              <div class="product-card">
-                <img src="${item.imageUrl}" alt="${item.name}">
-                <div class="product-info">
-                  <div class="product-name">${item.name}</div>
-                  <div class="product-price">$${item.price.toFixed(2)}</div>
-                  <button onclick="addToCart('${item.name}', ${item.price}, '${item.imageUrl}')">Add to Cart</button>
-                </div>
-              </div>
-            `;
-          });
-        }
+          </div>
+        `;
       });
     }
-
-    window.onload = function() {
-      loadGallery('galleryDisplay');
-      updateCartCount();
-    };
-
-    let selectedRating = 0;
-
-    // Star rating UI logic
-    document.querySelectorAll('#starRating span').forEach(star => {
-      star.addEventListener('click', () => {
-        selectedRating = parseInt(star.getAttribute('data-value'));
-        document.querySelectorAll('#starRating span').forEach(s => {
-          s.style.color = parseInt(s.getAttribute('data-value')) <= selectedRating ? '#f39c12' : '#ccc';
-        });
-      });
-    });
-
-    // Submit review
-document.getElementById('reviewForm').addEventListener('submit', async (e) => {
-  e.preventDefault();
-
-  const user = firebase.auth().currentUser;
-  if (!user) {
-    alert("You must be logged in to submit a review.");
-    return;
-  }
-
-  const name = document.getElementById('reviewName').value.trim();
-  const comment = document.getElementById('reviewComment').value.trim();
-  const msg = document.getElementById('reviewSubmitMsg');
-
-  if (!name || !comment || selectedRating === 0) {
-    msg.style.color = "red";
-    msg.textContent = "Please fill all fields and select a star rating.";
-    return;
-  }
-
-  try {
-    await db.collection('reviews').add({
-      name,
-      comment,
-      rating: selectedRating,
-      timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-      uid: user.uid
-    });
-
-    // ✅ Now update the booking before anything else
-    const snapshot = await db.collection('bookings')
-      .where('uid', '==', user.uid)
-      .where('reviewed', '==', false)
-      .orderBy('timestamp', 'desc')
-      .limit(1)
-      .get();
-
-    for (let doc of snapshot.docs) {
-      await doc.ref.update({ reviewed: true });
-    }
-
-    msg.style.color = "green";
-    msg.textContent = "Thank you for your review!";
-    document.getElementById('reviewForm').reset();
-    selectedRating = 0;
-    document.querySelectorAll('#starRating span').forEach(s => s.style.color = '#ccc');
-
-    // Optionally hide modal immediately after submitting review
-    document.getElementById('reviewModal').style.display = 'none';
-
-  } catch (error) {
-    console.error("Error submitting review or updating booking:", error);
-    msg.style.color = "red";
-    msg.textContent = "Error submitting review.";
-  }
-});
+  });
+}
 
 
     // Load reviews
