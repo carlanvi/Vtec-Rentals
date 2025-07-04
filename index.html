@@ -1,135 +1,848 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>QuickDrive Car Rentals</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GOLDEN HIVE HONEY</title>
+
+  <!-- Firebase Scripts -->
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-storage-compat.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Zilla+Slab:wght@400;700&display=swap" rel="stylesheet">
+
   <style>
     body {
+      font-family: 'Zilla Slab', serif;
       margin: 0;
-      font-family: 'Inter', sans-serif;
-      background: #f5f5f5;
-      color: #333;
+      padding: 0;
+      background-color: #F1C232;
     }
-    header {
-      background: #000;
-      color: white;
-      padding: 2rem;
+
+    .header-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 48px;
+      background-color: #F1C232;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+
+    .header-title {
+      font-family: 'Zilla Slab', serif;
+      font-size: 26px;
+      font-weight: bold;
+      background: linear-gradient(90deg, #007BFF, #007BFF, #2E8B57, #2E8B57);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);
+      white-space: nowrap;
       text-align: center;
     }
-    .container {
-      max-width: 1100px;
-      margin: auto;
-      padding: 2rem 1rem;
+
+    .menu-button {
+      position: absolute;
+      left: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      background-color: #E6B422;
+      color: #F4C2C2;
+      border: none;
+      border-radius: 0px;
+      cursor: pointer;
+      height: 48px;
+      width: 45px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      padding: 0;
     }
-    .car-list {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 1.5rem;
+
+    .menu {
+      position: fixed;
+      top: 48px;
+      left: 0;
+      width: 150px;
+      background-color: rgba(0, 0, 0, 0.8);
+      color: #E6B422;
+      padding: 20px;
+      transform: translateX(-100%);
+      transition: transform 0.3s ease;
+      height: auto;
+      min-height: 100px;
+      z-index: 999;
     }
-    .car {
-      background: white;
+
+    .menu.show {
+      transform: translateX(0);
+    }
+
+    .menu a {
+      display: block;
+      color: white;
+      margin-bottom: 15px;
+      text-decoration: none;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    h1 {
+      text-align: center;
+      color: #6200ea;
+      margin-top: 80px;
+    }
+
+    form {
+      max-width: 400px;
+      margin: 0 auto;
+      background-color: white;
+      padding: 20px;
       border-radius: 10px;
-      overflow: hidden;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
     }
-    .car img {
+
+    form input,
+    form select,
+    form button {
       width: 100%;
-      height: 200px;
+      padding: 12px;
+      margin-bottom: 15px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      box-sizing: border-box;
+    }
+
+    form button {
+      background-color: #6200ea;
+      color: white;
+      border: none;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    form button:hover {
+      background-color: #3700b3;
+    }
+
+    #bookingMessage {
+      text-align: center;
+      font-weight: bold;
+      color: green;
+      margin-top: 20px;
+    }
+
+    .gallery-category {
+      margin-top: 40px;
+    }
+
+    .gallery-category h3 {
+      text-align: center;
+      margin-bottom: 15px;
+      font-size: 22px;
+      color: #6200ea;
+      text-transform: uppercase;
+    }
+
+    .gallery-wrapper {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 0 10px;
+    }
+
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 15px;
+      margin-bottom: 30px;
+    }
+
+    .gallery-grid img {
+      width: 100%;
+      border-radius: 10px;
+      box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      height: 230px;
       object-fit: cover;
     }
-    .car-info {
-      padding: 1rem;
+
+    .content-section {
+      display: none;
     }
-    .car-info h3 {
-      margin-top: 0;
+
+    .content-section.active {
+      display: block;
     }
-    .btn {
-      background: #000;
+
+    .menu a.admin-button {
+      background-color: #6A0DAD;
       color: white;
-      padding: 0.75rem 1.5rem;
-      display: inline-block;
-      text-decoration: none;
-      border-radius: 5px;
-      margin-top: 1rem;
-    }
-    form {
-      background: white;
-      padding: 2rem;
-      border-radius: 10px;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-      margin-top: 2rem;
-    }
-    form input, form textarea {
-      width: 100%;
-      padding: 1rem;
-      margin-bottom: 1rem;
-      border: 1px solid #ddd;
-      border-radius: 5px;
-      font-size: 1rem;
-    }
-    footer {
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-family: 'Poppins', sans-serif;
+      font-weight: bold;
+      display: block;
+      margin: 50px auto 0;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
       text-align: center;
-      padding: 2rem;
-      font-size: 0.9rem;
-      background: #eee;
-      margin-top: 3rem;
+      width: fit-content;
     }
+
+    .menu a.admin-button:hover {
+      background-color: #3700b3;
+    }
+
+    .location-button {
+      position: absolute;
+      right: 0px;
+      top: 50%;
+      transform: translateY(-50%);
+      background-color: #E6B422;
+      color: red;
+      border: none;
+      padding: 0;
+      border-radius: 0px;
+      cursor: pointer;
+      height: 48px;
+      width: 45px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      text-decoration: none;
+    }
+
+    .separator-line {
+      border-bottom: 2px solid purple;
+      margin: 20px 0;
+    }
+
+    .product-card {
+      background: #FCE8A8;
+      border: 1px solid #eee;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      padding: 10px;
+      text-align: center;
+    }
+
+    .product-card img {
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+      border-radius: 6px;
+      margin-bottom: 8px;
+    }
+
+    .product-info {
+      margin-top: 5px;
+    }
+
+    .product-name {
+      font-weight: bold;
+      margin-bottom: 4px;
+    }
+
+    .product-price {
+      color: #6200ea;
+      margin-bottom: 6px;
+    }
+
+    .product-card button {
+      background-color: #EFB034;
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    /* Cart Modal Styling */
+    #cartModal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0,0,0,0.5);
+      display: none;
+      z-index: 2000;
+    }
+
+    #cartModal > div {
+      background: white;
+      max-width: 320px;
+      margin: 80px auto;
+      border-radius: 12px;
+      padding: 15px 20px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      font-family: 'Zilla Slab', serif;
+      max-height: 70vh;
+      overflow-y: auto;
+    }
+
+    #cartModal h2 {
+      margin-top: 0;
+      text-align: center;
+      color: #6200ea;
+    }
+
+    #cartItemsContainer > div {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 0;
+      border-bottom: 1px solid #eee;
+    }
+
+    #cartItemsContainer img {
+      width: 50px;
+      height: 50px;
+      object-fit: cover;
+      border-radius: 6px;
+      margin-right: 10px;
+    }
+
+    #cartItemsContainer span {
+      font-weight: normal;
+    }
+
+    #cartItemsContainer div > div {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-grow: 1;
+    }
+
+    #cartButtons {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 15px;
+    }
+
+    #cartButtons button {
+      flex: 1;
+      padding: 10px 0;
+      font-weight: bold;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-family: 'Zilla Slab', serif;
+      font-size: 16px;
+      margin: 0 5px;
+      transition: background-color 0.3s ease;
+    }
+
+    #checkoutBtn {
+      background-color: #6200ea;
+      color: white;
+    }
+
+    #checkoutBtn:hover {
+      background-color: #3700b3;
+    }
+
+    #closeCartBtn {
+      background-color: #ccc;
+      color: black;
+    }
+
+    #closeCartBtn:hover {
+      background-color: #999;
+    }
+
   </style>
 </head>
+
 <body>
 
-<header>
-  <h1>QuickDrive Car Rentals</h1>
-  <p>Affordable. Reliable. Fast Booking.</p>
-</header>
+  <div class="header-bar">
+    <button class="menu-button" onclick="toggleMenu()">☰</button>
+    <div class="header-title">GOLDEN HIVE HONEY</div>
+    <button class="location-button" onclick="viewCart()">🛒 <span id="cart-count">0</span></button>
+  </div>
 
-<div class="container">
-  <section class="car-list">
-    <div class="car">
-      <img src="https://via.placeholder.com/600x400" alt="Toyota Axio">
-      <div class="car-info">
-        <h3>Toyota Axio</h3>
-        <p>$50/day • Auto • 5 seats • A/C</p>
-        <a href="https://wa.me/YOURNUMBER" class="btn">Book on WhatsApp</a>
+  <!-- Gallery Section -->
+  <div id="gallerySection" class="content-section active">
+    <h2 style="text-align:center; margin-top:60px;"></h2>
+    <div id="galleryDisplay"></div>
+  </div>
+
+  <!-- Menu -->
+  <div class="menu" id="menu">
+    <a onclick="showSection('gallerySection'); closeMenu();" href="javascript:void(0);"> 🍯 PRODUCTS</a>
+    <a onclick="showSection('reviewsSection'); closeMenu();" href="javascript:void(0);">⭐️ REVIEWS</a>
+
+    <a onclick="logoutUser(); closeMenu();" style="display:block; text-align:center; margin:10px auto; padding:10px 20px; background-color:red; color:white; border-radius:6px; cursor:pointer; text-decoration:none; width:80%; font-weight:bold;" href="javascript:void(0);">LOGOUT</a>
+
+    <a onclick="login(); closeMenu();" class="admin-button" style="display:block; text-align:center; margin:10px auto; padding:10px 20px; background-color:#6200ea; color:white; border-radius:6px; text-decoration:none; width:80%; font-weight:bold;" href="javascript:void(0);">ADMIN</a>
+  </div>
+
+  <!-- Reviews Section -->
+  <div id="reviewsSection" class="content-section" style="padding-top: 32.7px; background-color: black; color: white;">
+
+  <div id="reviewFormContainer" style="
+    max-width: 500px;
+    margin: 10px auto 20px auto;
+    background-color: #F1C232;
+    padding: 5px;
+    border-radius: 10px;
+    color: black;">
+    
+    <form id="reviewForm" style="text-align: center;">
+      <input type="text" id="reviewName" placeholder="Your Name" required
+        style="width: 100%; padding: 8px; margin-bottom: 6px; border-radius: 6px; border: 1px solid #555; background-color: #fff; color: black; box-sizing: border-box;" />
+
+      <textarea id="reviewComment" placeholder="Write your review..." required
+        style="width: 100%; height: 60px; padding: 8px; margin-bottom: 6px; border-radius: 6px; border: 1px solid #555; background-color: #fff; color: black; box-sizing: border-box;"></textarea>
+
+      <div id="starRating" style="font-size: 22px; margin-bottom: 6px; cursor: pointer; color: #ccc; letter-spacing: -2px;">
+        <span data-value="1">★</span><span data-value="2">★</span><span data-value="3">★</span><span data-value="4">★</span><span data-value="5">★</span>
       </div>
-    </div>
 
-    <div class="car">
-      <img src="https://via.placeholder.com/600x400" alt="Honda Fit">
-      <div class="car-info">
-        <h3>Honda Fit</h3>
-        <p>$45/day • Auto • Great MPG • Compact</p>
-        <a href="https://wa.me/YOURNUMBER" class="btn">Book on WhatsApp</a>
-      </div>
-    </div>
-
-    <div class="car">
-      <img src="https://via.placeholder.com/600x400" alt="Nissan Tiida">
-      <div class="car-info">
-        <h3>Nissan Tiida</h3>
-        <p>$40/day • Auto • Spacious • A/C</p>
-        <a href="https://wa.me/YOURNUMBER" class="btn">Book on WhatsApp</a>
-      </div>
-    </div>
-  </section>
-
-  <section>
-    <h2 style="margin-top: 3rem;">Request a Car</h2>
-    <form action="https://formsubmit.co/YOUR@EMAIL.com" method="POST">
-      <input type="text" name="name" placeholder="Full Name" required />
-      <input type="email" name="email" placeholder="Email Address" required />
-      <input type="text" name="car" placeholder="Preferred Car or Dates" required />
-      <textarea name="message" rows="4" placeholder="Any additional notes or questions"></textarea>
-      <button type="submit" class="btn">Submit Request</button>
+      <button type="submit" style="background-color: #6200ea; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer;">
+        Submit Review
+      </button>
     </form>
-  </section>
+  </div>
+
+  <h1 style="text-align: center; color: #9b59b6; margin-top: 5px; margin-bottom: 10px;">REVIEWS</h1>
+
+  <p id="reviewSubmitMsg" style="text-align: center; color: #7fff7f; margin-top: 0;"></p>
+
+  <div id="reviewsContainer" style="max-width: 600px; margin: 0 auto; color: white;"></div>
 </div>
 
-<footer>
-  © 2025 QuickDrive Rentals • <a href="#">Terms & Conditions</a>
-</footer>
+  <!-- Cart Modal -->
+  <div id="cartModal">
+    <div>
+      <h2>Your Cart</h2>
+      <div id="cartItemsContainer"></div>
+      <div id="cartTotal" style="text-align:right; font-weight:bold; margin-top: 10px;"></div>
+      <div id="cartButtons">
+        <button id="closeCartBtn">Close</button>
+        <button id="checkoutBtn">Checkout</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let currentUser = null;
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDccI-TdbCXAJr6CD77X4yOUOfezef7Oks",
+      authDomain: "delivery-login-3a084.firebaseapp.com",
+      projectId: "delivery-login-3a084",
+      storageBucket: "delivery-login-3a084.firebasestorage.app",
+      messagingSenderId: "201998621677",
+      appId: "1:201998621677:web:b51c3aeb2debe18b4aa5e4"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    firebase.auth().onAuthStateChanged(user => {
+      if (!user) {
+        window.location.href = 'login.html';
+      } else {
+        currentUser = user;
+        loadReviews(currentUser);
+      }
+    });
+
+    function login() {
+      const email = prompt('Enter admin email:');
+      const password = prompt('Enter admin password:');
+
+      firebase.auth().signInWithEmailAndPassword(email, password)
+        .then(() => {
+          window.location.href = 'dashboard.html';
+        })
+        .catch((error) => {
+          alert('Authentication failed: ' + error.message);
+        });
+    }
+
+    function toggleMenu() {
+      const menu = document.getElementById('menu');
+      menu.classList.toggle('show');
+    }
+
+    function closeMenu() {
+      const menu = document.getElementById('menu');
+      menu.classList.remove('show');
+    }
+
+    function loadGallery(containerId) {
+      const galleryContainer = document.getElementById(containerId);
+      galleryContainer.innerHTML = '';
+
+      db.collection('gallery').onSnapshot((querySnapshot) => {
+        galleryContainer.innerHTML = '';
+
+        const categories = {};
+
+        querySnapshot.forEach((doc) => {
+          const data = doc.data();
+          const imageUrl = data.url;
+          const name = data.name || 'Unnamed';
+          const price = data.price || 0;
+          const category = data.category || 'Uncategorized';
+
+          if (!categories[category]) {
+            categories[category] = [];
+          }
+          categories[category].push({ imageUrl, name, price });
+        });
+
+        for (const category in categories) {
+          galleryContainer.innerHTML += `
+            <div class="gallery-category">
+              <h3>${category}</h3>
+              <div class="gallery-wrapper">
+                <div class="gallery-grid" id="gallery-${category}"></div>
+              </div>
+            </div>
+          `;
+
+          const categoryContainer = document.getElementById(`gallery-${category}`);
+          categories[category].forEach((item) => {
+            categoryContainer.innerHTML += `
+              <div class="product-card">
+                <img src="${item.imageUrl}" alt="${item.name}">
+                <div class="product-info">
+                  <div class="product-name">${item.name}</div>
+                  <div class="product-price">$${item.price.toFixed(2)}</div>
+                  <button onclick="addToCart('${item.name}', ${item.price}, '${item.imageUrl}')">Add to Cart</button>
+                </div>
+              </div>
+            `;
+          });
+        }
+      });
+    }
+
+    window.onload = function() {
+      loadGallery('galleryDisplay');
+      updateCartCount();
+    };
+
+    let selectedRating = 0;
+
+    // Star rating UI logic
+    document.querySelectorAll('#starRating span').forEach(star => {
+      star.addEventListener('click', () => {
+        selectedRating = parseInt(star.getAttribute('data-value'));
+        document.querySelectorAll('#starRating span').forEach(s => {
+          s.style.color = parseInt(s.getAttribute('data-value')) <= selectedRating ? '#f39c12' : '#ccc';
+        });
+      });
+    });
+
+    // Submit review
+document.getElementById('reviewForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+
+  const user = firebase.auth().currentUser;
+  if (!user) {
+    alert("You must be logged in to submit a review.");
+    return;
+  }
+
+  const name = document.getElementById('reviewName').value.trim();
+  const comment = document.getElementById('reviewComment').value.trim();
+  const msg = document.getElementById('reviewSubmitMsg');
+
+  if (!name || !comment || selectedRating === 0) {
+    msg.style.color = "red";
+    msg.textContent = "Please fill all fields and select a star rating.";
+    return;
+  }
+
+  try {
+    await db.collection('reviews').add({
+      name,
+      comment,
+      rating: selectedRating,
+      timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+      uid: user.uid
+    });
+
+    // ✅ Now update the booking before anything else
+    const snapshot = await db.collection('bookings')
+      .where('uid', '==', user.uid)
+      .where('reviewed', '==', false)
+      .orderBy('timestamp', 'desc')
+      .limit(1)
+      .get();
+
+    for (let doc of snapshot.docs) {
+      await doc.ref.update({ reviewed: true });
+    }
+
+    msg.style.color = "green";
+    msg.textContent = "Thank you for your review!";
+    document.getElementById('reviewForm').reset();
+    selectedRating = 0;
+    document.querySelectorAll('#starRating span').forEach(s => s.style.color = '#ccc');
+
+    // Optionally hide modal immediately after submitting review
+    document.getElementById('reviewModal').style.display = 'none';
+
+  } catch (error) {
+    console.error("Error submitting review or updating booking:", error);
+    msg.style.color = "red";
+    msg.textContent = "Error submitting review.";
+  }
+});
+
+
+    // Load reviews
+    function loadReviews(user) {
+      const container = document.getElementById('reviewsContainer');
+      container.innerHTML = '';
+
+      db.collection('reviews').orderBy('timestamp', 'desc').get().then(snapshot => {
+        if (snapshot.empty) {
+          container.innerHTML = '<p>No reviews yet.</p>';
+          return;
+        }
+
+        snapshot.forEach(doc => {
+          const data = doc.data();
+          const canDelete = user && data.uid === user.uid;
+
+          const reviewDiv = document.createElement('div');
+          reviewDiv.style.borderBottom = '1px solid #ddd';
+          reviewDiv.style.padding = '10px 0';
+
+          const stars = '★'.repeat(data.rating) + '☆'.repeat(5 - data.rating);
+
+          reviewDiv.innerHTML = `
+            <strong>${data.name}</strong> <span style="color: #f39c12;">${stars}</span><br/>
+            <p>${data.comment}</p>
+          `;
+
+          if (canDelete) {
+            const delBtn = document.createElement('button');
+            delBtn.textContent = 'Delete';
+            delBtn.style.backgroundColor = '#e74c3c';
+            delBtn.style.color = 'white';
+            delBtn.style.border = 'none';
+            delBtn.style.padding = '5px 10px';
+            delBtn.style.borderRadius = '4px';
+            delBtn.style.cursor = 'pointer';
+            delBtn.onclick = () => deleteReview(doc.id);
+            reviewDiv.appendChild(delBtn);
+          }
+
+          container.appendChild(reviewDiv);
+        });
+      });
+    }
+
+    // Delete review
+    function deleteReview(docId) {
+      const user = firebase.auth().currentUser;
+      if (!user) {
+        alert('You must be logged in to delete reviews.');
+        return;
+      }
+
+      db.collection('reviews').doc(docId).get().then(doc => {
+        if (doc.exists && doc.data().uid === user.uid) {
+          db.collection('reviews').doc(docId).delete()
+            .then(() => {
+              alert('Review deleted.');
+              loadReviews(user);
+            })
+            .catch(error => {
+              alert('Error deleting review: ' + error.message);
+            });
+        } else {
+          alert("You can only delete your own reviews.");
+        }
+      });
+    }
+
+    // Show section
+    function showSection(sectionId) {
+      document.querySelectorAll('.content-section').forEach(section => {
+        section.classList.remove('active');
+      });
+      document.getElementById(sectionId).classList.add('active');
+    }
+
+    // Logout
+    function logoutUser() {
+      firebase.auth().signOut().then(() => {
+        window.location.href = 'login.html';
+      });
+    }
+
+    // CART FUNCTIONALITY
+
+  function addToCart(name, price, imageUrl) {
+    let cart = JSON.parse(localStorage.getItem('cart')) || [];
+    const existingItem = cart.find(item => item.name === name);
+    if (existingItem) {
+      existingItem.quantity += 1;
+    } else {
+      cart.push({ name, price, imageUrl, quantity: 1 });
+    }
+    localStorage.setItem('cart', JSON.stringify(cart));
+    updateCartCount();
+    alert(`${name} added to cart.`);
+  }
+
+  function updateCartCount() {
+    let cart = JSON.parse(localStorage.getItem('cart')) || [];
+    // sum quantities, not just items
+    const count = cart.reduce((total, item) => total + item.quantity, 0);
+    document.getElementById('cart-count').textContent = count;
+  }
+
+  function viewCart() {
+    const modal = document.getElementById('cartModal');
+    const container = document.getElementById('cartItemsContainer');
+    const totalElem = document.getElementById('cartTotal');
+    container.innerHTML = '';
+
+    let cart = JSON.parse(localStorage.getItem('cart')) || [];
+    if (cart.length === 0) {
+      container.innerHTML = '<p>Your cart is empty.</p>';
+      totalElem.textContent = '';
+    } else {
+      let total = 0;
+
+      cart.forEach((item, index) => {
+        total += item.price * item.quantity;
+
+        const itemDiv = document.createElement('div');
+        itemDiv.style.display = 'flex';
+        itemDiv.style.alignItems = 'center';
+        itemDiv.style.justifyContent = 'space-between';
+        itemDiv.style.padding = '8px 0';
+        itemDiv.style.borderBottom = '1px solid #eee';
+
+        const img = document.createElement('img');
+        img.src = item.imageUrl;
+        img.alt = item.name;
+        img.style.width = '50px';
+        img.style.height = '50px';
+        img.style.objectFit = 'cover';
+        img.style.borderRadius = '6px';
+        img.style.marginRight = '8px';
+
+        const infoDiv = document.createElement('div');
+        infoDiv.style.flexGrow = '1';
+        infoDiv.style.display = 'flex';
+        infoDiv.style.alignItems = 'center';
+        infoDiv.style.justifyContent = 'space-between';
+
+        const nameSpan = document.createElement('span');
+        nameSpan.textContent = item.name;
+
+        const controlsDiv = document.createElement('div');
+        controlsDiv.style.display = 'flex';
+        controlsDiv.style.alignItems = 'center';
+
+        // Subtract button
+        const minusBtn = document.createElement('button');
+        minusBtn.textContent = '–';
+        minusBtn.style.margin = '0 4px';
+        minusBtn.onclick = () => changeQuantity(index, -1);
+
+        // Quantity input
+        const qtyInput = document.createElement('input');
+        qtyInput.type = 'number';
+        qtyInput.value = item.quantity;
+        qtyInput.readOnly = true;
+        qtyInput.style.width = '30px';
+        qtyInput.style.textAlign = 'center';
+
+        // Add button
+        const plusBtn = document.createElement('button');
+        plusBtn.textContent = '+';
+        plusBtn.style.margin = '0 4px';
+        plusBtn.onclick = () => changeQuantity(index, 1);
+
+        // Remove button
+        const removeBtn = document.createElement('button');
+        removeBtn.textContent = '✖';
+        removeBtn.style.color = 'red';
+        removeBtn.style.marginLeft = '8px';
+        removeBtn.onclick = () => removeItem(index);
+
+        controlsDiv.appendChild(minusBtn);
+        controlsDiv.appendChild(qtyInput);
+        controlsDiv.appendChild(plusBtn);
+        controlsDiv.appendChild(removeBtn);
+
+        const priceSpan = document.createElement('span');
+        priceSpan.textContent = `$${(item.price * item.quantity).toFixed(2)}`;
+        priceSpan.style.marginLeft = '10px';
+        priceSpan.style.fontWeight = 'bold';
+
+        infoDiv.appendChild(nameSpan);
+        infoDiv.appendChild(priceSpan);
+
+        itemDiv.appendChild(img);
+        itemDiv.appendChild(infoDiv);
+        itemDiv.appendChild(controlsDiv);
+
+        container.appendChild(itemDiv);
+      });
+
+      totalElem.textContent = `Total: $${total.toFixed(2)}`;
+    }
+
+    modal.style.display = 'block';
+  }
+
+  function changeQuantity(index, delta) {
+    let cart = JSON.parse(localStorage.getItem('cart')) || [];
+    if (cart[index]) {
+      cart[index].quantity += delta;
+      if (cart[index].quantity <= 0) {
+        cart.splice(index, 1); // remove item if qty <= 0
+      }
+      localStorage.setItem('cart', JSON.stringify(cart));
+      updateCartCount();
+      viewCart();
+    }
+  }
+
+  function removeItem(index) {
+    let cart = JSON.parse(localStorage.getItem('cart')) || [];
+    if (cart[index]) {
+      cart.splice(index, 1);
+      localStorage.setItem('cart', JSON.stringify(cart));
+      updateCartCount();
+      viewCart();
+    }
+  }
+
+  // Close cart modal
+  document.getElementById('closeCartBtn').addEventListener('click', () => {
+    document.getElementById('cartModal').style.display = 'none';
+  });
+
+  // Checkout click
+  document.getElementById('checkoutBtn').addEventListener('click', () => {
+    alert("Checkout functionality is not implemented yet.");
+  });
+
+  </script>
 
 </body>
+
 </html>
