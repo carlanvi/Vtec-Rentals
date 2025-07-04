@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ADMIN DASHBOARD</title>
+
+  <!-- Firebase Scripts -->
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Zilla+Slab:wght@400;700&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      font-family: 'Zilla Slab', serif;
+      background-color: #f4f4f4;
+      margin: 0;
+      padding: 0;
+    }
+    .header-bar {
+      background-color: #FFD1DC;
+      padding: 8px;
+      text-align: center;
+      font-size: 27px;
+      font-weight: bold;
+      color: #6200ea;
+    }
+    .top-menu {
+      display: flex;
+      justify-content: center;
+      background-color: #6200ea;
+      padding: 10px 0;
+    }
+    .top-menu button {
+      background-color: white;
+      color: #6200ea;
+      border: none;
+      padding: 6px 12px;
+      margin: 0 10px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    .top-menu button:hover {
+      background-color: #FFD1DC;
+    }
+    .admin-container {
+      max-width: 1000px;
+      margin: 20px auto;
+      padding: 20px;
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+    h2 {
+      color: #6200ea;
+      text-align: center;
+    }
+    input[type="text"], input[type="number"], select {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 15px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      box-sizing: border-box;
+    }
+    button {
+      background-color: #6200ea;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-bottom: 20px;
+    }
+    button:hover {
+      background-color: #3700b3;
+    }
+    .gallery-category {
+      margin-top: 40px;
+    }
+    .gallery-category h3 {
+      text-align: center;
+      margin-bottom: 15px;
+      font-size: 22px;
+      color: #6200ea;
+      text-transform: uppercase;
+    }
+    .gallery-wrapper {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 0 10px;
+    }
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 15px;
+      margin-bottom: 30px;
+    }
+    .gallery-grid div {
+      position: relative;
+    }
+    .gallery-grid img {
+      width: 100%;
+      height: 250px;
+      object-fit: cover;
+      border-radius: 10px;
+      box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+    }
+    .remove-btn {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background-color: red;
+      color: white;
+      border: none;
+      padding: 5px 8px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .content-section {
+      display: none;
+    }
+    .content-section.active {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <div class="header-bar">ADMIN DASHBOARD</div>
+
+  <div class="top-menu">
+    <button onclick="showSection('gallerySection')">GALLERY</button>
+    <button onclick="showSection('reservationsPage')">RESERVATIONS</button>
+    <button onclick="showSection('unavailableDaysSection')">UNAVAILABLE DAYS</button>
+  </div>
+
+  <!-- Gallery Management Page -->
+  <div id="gallerySection" class="admin-container content-section">
+    <h2>ADD NEW ITEM</h2>
+    <input type="text" id="itemNameInput" placeholder="Item Name">
+    <input type="number" id="itemPriceInput" placeholder="Item Price">
+    <input type="text" id="photoUrlInput" placeholder="Image URL">
+
+    <label for="photoCategorySelect">Select Category</label>
+    <select id="photoCategorySelect">
+      <option value="SAGE HONEY">SAGE HONEY</option>
+      <option value="FIREWEED HONEY">FIREWEED HONEY</option>
+      <option value="SUNFLOWER HONEY">SUNFLOWER HONEY</option>
+      <option value="CHESTNUT HONEY">CHESTNUT HONEY</option>
+      <option value="CITRUS HONEY">CITRUS HONEY</option>
+    </select>
+
+    <button onclick="addPhotoUrl()">Add Item</button>
+
+    <div id="adminGallery"></div>
+  </div>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyDccI-TdbCXAJr6CD77X4yOUOfezef7Oks",
+      authDomain: "delivery-login-3a084.firebaseapp.com",
+      projectId: "delivery-login-3a084",
+      storageBucket: "delivery-login-3a084.appspot.com",
+      messagingSenderId: "201998621677",
+      appId: "1:201998621677:web:b51c3aeb2debe18b4aa5e4"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    function showSection(sectionId) {
+      document.querySelectorAll('.content-section').forEach(section =>
+        section.classList.remove('active')
+      );
+      document.getElementById(sectionId).classList.add('active');
+    }
+
+    function addPhotoUrl() {
+      const name = document.getElementById('itemNameInput').value.trim();
+      const price = parseFloat(document.getElementById('itemPriceInput').value);
+      const url = document.getElementById('photoUrlInput').value.trim();
+      const category = document.getElementById('photoCategorySelect').value.trim();
+
+      if (!name || !price || !url || !category) {
+        alert('Please fill in all fields.');
+        return;
+      }
+
+      db.collection('gallery').add({
+        name: name,
+        price: price,
+        url: url,
+        category: category,
+        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+      })
+      .then(() => {
+        alert('Item added successfully!');
+        document.getElementById('itemNameInput').value = '';
+        document.getElementById('itemPriceInput').value = '';
+        document.getElementById('photoUrlInput').value = '';
+        document.getElementById('photoCategorySelect').value = '';
+      })
+      .catch(error => {
+        console.error("Error adding item: ", error);
+        alert('Error adding item: ' + error.message);
+      });
+    }
+
+    function loadGallery() {
+      const galleryContainer = document.getElementById('adminGallery');
+      galleryContainer.innerHTML = '';
+
+      db.collection('gallery').orderBy('timestamp', 'desc').onSnapshot((querySnapshot) => {
+        galleryContainer.innerHTML = '';
+        const categories = {};
+
+        querySnapshot.forEach((doc) => {
+          const data = doc.data();
+          const category = data.category || 'Uncategorized';
+
+          if (!categories[category]) categories[category] = [];
+          categories[category].push({ ...data, docId: doc.id });
+        });
+
+        for (const category in categories) {
+          galleryContainer.innerHTML += `
+            <div class="gallery-category">
+              <h3>${category}</h3>
+              <div class="gallery-wrapper">
+                <div class="gallery-grid" id="gallery-${category}"></div>
+              </div>
+            </div>
+          `;
+
+          const categoryContainer = document.getElementById(`gallery-${category}`);
+          categories[category].forEach(item => {
+            categoryContainer.innerHTML += `
+              <div>
+                <img src="${item.url}" alt="${item.name}">
+                <button class="remove-btn" onclick="removePhoto('${item.docId}')">X</button>
+              </div>
+            `;
+          });
+        }
+      });
+    }
+
+    function removePhoto(docId) {
+      db.collection('gallery').doc(docId).delete().catch((error) => {
+        console.error("Error removing document: ", error);
+        alert('Error removing photo: ' + error.message);
+      });
+    }
+
+    firebase.auth().onAuthStateChanged((user) => {
+      if (user) {
+        showSection('gallerySection');
+        loadGallery();
+      } else {
+        window.location.href = 'index.html';
+      }
+    });
+  </script>
+</body>
+</html>
