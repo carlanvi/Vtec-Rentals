@@ -1078,11 +1078,16 @@ document.getElementById('checkoutBtn').addEventListener('click', async () => {
   const nameField = document.getElementById("customerName");
   const phoneField = document.getElementById("customerPhone");
   const locationField = document.getElementById("customerLocation");
+  const dateField = document.getElementById("startDate");
+  const startTimeField = document.getElementById("startTime");
+  const endTimeField = document.getElementById("endTime");
 
   let valid = true;
 
-  [nameField, phoneField, locationField].forEach(field => {
-    field.classList.remove("error"); // clear old errors
+  const requiredFields = [nameField, phoneField, locationField, dateField, startTimeField, endTimeField];
+
+  requiredFields.forEach(field => {
+    field.classList.remove("error");
     if (!field.value.trim()) {
       field.classList.add("error");
       valid = false;
@@ -1090,24 +1095,27 @@ document.getElementById('checkoutBtn').addEventListener('click', async () => {
   });
 
   if (!valid) {
-    nameField.focus(); // focus the first field (or you could scroll to it)
+    requiredFields.find(field => field.classList.contains("error")).focus();
     return;
   }
 
-  const cart = JSON.parse(localStorage.getItem('cart')) || [];
   const name = nameField.value.trim();
   const phone = phoneField.value.trim();
   const location = locationField.value.trim();
+  const rentalDate = dateField.value;
+  const startTime = startTimeField.value;
+  const endTime = endTimeField.value;
+  const cart = JSON.parse(localStorage.getItem('cart')) || [];
 
-  // Save order, send to backend, etc. here if needed
+  // Optional: send this data to Firestore or server
+  // await db.collection("orders").add({ name, phone, location, rentalDate, startTime, endTime, cart });
 
-  alert(`Thanks ${name}, we’ll deliver to: ${location}`);
+  alert(`Thank you, ${name}! Your booking for ${rentalDate} from ${startTime} to ${endTime} is confirmed.`);
 
   localStorage.removeItem('cart');
   updateCartCount();
   document.getElementById('cartModal').style.display = 'none';
 });
-
 
     function showToast(message = "ADDED TO CART", type = "success") {
   const toast = document.getElementById('toast');
