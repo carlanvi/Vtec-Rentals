@@ -458,6 +458,11 @@
   </div>
 </div>
 
+      <div style="margin-bottom: 15px;">
+  <label for="customerLocation"><strong>Location:</strong></label>
+  <input type="text" id="customerLocation" placeholder="Enter delivery location" style="width: 100%; padding: 10px;" required />
+</div>
+
       <div id="cartItemsContainer"></div>
       <div id="cartTotal" style="text-align:right; font-weight:bold; margin-top: 10px;"></div>
       <div id="cartButtons">
@@ -1067,18 +1072,20 @@ document.getElementById('closeCartBtn').addEventListener('click', () => {
 document.getElementById('checkoutBtn').addEventListener('click', async () => {
   const name = document.getElementById("customerName").value.trim();
   const phone = document.getElementById("customerPhone").value.trim();
+  const location = document.getElementById("customerLocation").value.trim();
 
-  if (!name || !phone) {
-    alert("Please enter your name and phone number before checking out.");
+  if (!name || !phone || !location) {
+    alert("Please enter your name, phone number, and location before checking out.");
     return;
   }
 
-  // OPTIONAL: send to Firestore
-  // await db.collection("orders").add({ name, phone, ... });
+  const cart = JSON.parse(localStorage.getItem('cart')) || [];
 
-  alert(`Thank you, ${name}. Your booking has been received.`);
+  // Example: save to Firestore if desired
+  // await db.collection("orders").add({ name, phone, location, cart });
 
-  // Clear cart & reset form
+  alert(`Thanks ${name}, we’ll deliver to: ${location}`);
+
   localStorage.removeItem('cart');
   updateCartCount();
   document.getElementById('cartModal').style.display = 'none';
