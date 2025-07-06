@@ -785,6 +785,9 @@ document.getElementById('reviewForm').addEventListener('submit', async (e) => {
   const itemId = name.replace(/\s+/g, '-');
   const qty = parseInt(document.getElementById(`qty-${itemId}`).value) || 1;
   const price = parseFloat(document.getElementById(`price-${itemId}`).textContent);
+const totalPrice = price; // only for 1 day, updated later
+
+cart.push({ name, price, imageUrl, quantity: qty, days: 1, totalPrice });
 
   let cart = JSON.parse(localStorage.getItem('cart')) || [];
 
@@ -945,7 +948,8 @@ function updateCartCount() {
 
   cart.forEach(item => {
     item.days = days;
-    item.totalPrice = item.price * days;
+    item.totalPrice = item.price * days; // Don't multiply by quantity again
+    item.days = days;
   });
 
   localStorage.setItem('cart', JSON.stringify(cart));
@@ -998,7 +1002,7 @@ function viewCart() {
       quantityText.style.marginLeft = '10px';
 
       const priceSpan = document.createElement('span');
-      priceSpan.textContent = `$${(item.totalPrice || (item.price * item.quantity)).toFixed(2)} (${item.days || 1} day${(item.days > 1 ? 's' : '')})`;
+      priceSpan.textContent = `$${(item.totalPrice || item.price).toLocaleString(undefined, { minimumFractionDigits: 2 })} (${item.days || 1} day${item.days > 1 ? 's' : ''})`;
       priceSpan.style.marginLeft = '10px';
       priceSpan.style.fontWeight = 'bold';
 
@@ -1026,8 +1030,7 @@ function viewCart() {
       container.appendChild(itemDiv);
     });
 
-    totalElem.textContent = `Total: $${total.toFixed(2)}`;
-  }
+    totalElem.textContent = `Total: $${total.toLocaleString(undefined, { minimumFractionDigits: 2 })}`;
 
   modal.style.display = 'block';
 }
