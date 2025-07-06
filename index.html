@@ -970,14 +970,14 @@ function viewCart() {
     let total = 0;
 
     cart.forEach((item, index) => {
-  total += item.totalPrice || (item.price * item.quantity);
+      total += item.totalPrice || (item.price * item.quantity);
 
-  const itemDiv = document.createElement('div');
-  itemDiv.style.display = 'flex';
-  itemDiv.style.alignItems = 'center';
-  itemDiv.style.justifyContent = 'space-between';
-  itemDiv.style.padding = '8px 0';
-  itemDiv.style.borderBottom = '1px solid #eee';
+      const itemDiv = document.createElement('div');
+      itemDiv.style.display = 'flex';
+      itemDiv.style.alignItems = 'center';
+      itemDiv.style.justifyContent = 'space-between';
+      itemDiv.style.padding = '8px 0';
+      itemDiv.style.borderBottom = '1px solid #eee';
 
       const img = document.createElement('img');
       img.src = item.imageUrl;
@@ -1010,7 +1010,6 @@ function viewCart() {
       controlsDiv.style.display = 'flex';
       controlsDiv.style.alignItems = 'center';
 
-      // Remove button only
       const removeBtn = document.createElement('button');
       removeBtn.textContent = '✖';
       removeBtn.style.color = 'red';
@@ -1031,6 +1030,7 @@ function viewCart() {
     });
 
     totalElem.textContent = `Total: $${total.toLocaleString(undefined, { minimumFractionDigits: 2 })}`;
+  } // ✅ This was missing!
 
   modal.style.display = 'block';
 }
