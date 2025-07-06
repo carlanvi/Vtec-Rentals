@@ -426,6 +426,20 @@
   <div id="cartModal">
     <div>
       <h2>Your Cart</h2>
+      <div style="margin-bottom: 10px;">
+  <label>Start Date:</label>
+  <input type="date" id="rentalStartDate" onchange="updateRentalDuration()" required />
+
+  <label>Start Time:</label>
+  <input type="time" id="rentalStartTime" required />
+
+  <label style="margin-top: 10px;">End Date:</label>
+  <input type="date" id="rentalEndDate" onchange="updateRentalDuration()" required />
+
+  <label>End Time:</label>
+  <input type="time" id="rentalEndTime" required />
+</div>
+
       <div id="cartItemsContainer"></div>
       <div id="cartTotal" style="text-align:right; font-weight:bold; margin-top: 10px;"></div>
       <div id="cartButtons">
@@ -879,6 +893,33 @@ function updateCartCount() {
   document.getElementById('cart-count').textContent = count;
 }
 
+    function updateRentalDuration() {
+  const startDateInput = document.getElementById('rentalStartDate');
+  const endDateInput = document.getElementById('rentalEndDate');
+
+  if (!startDateInput.value || !endDateInput.value) return;
+
+  const start = new Date(startDateInput.value);
+  const end = new Date(endDateInput.value);
+  const msPerDay = 1000 * 60 * 60 * 24;
+  const days = Math.ceil((end - start) / msPerDay);
+
+  if (isNaN(days) || days < 1) {
+    alert("Minimum rental period is 1 full day.");
+    return;
+  }
+
+  let cart = JSON.parse(localStorage.getItem('cart')) || [];
+
+  cart.forEach(item => {
+    item.days = days;
+    item.totalPrice = item.price * days;
+  });
+
+  localStorage.setItem('cart', JSON.stringify(cart));
+  viewCart(); // update UI
+}
+
 function viewCart() {
   const modal = document.getElementById('cartModal');
   const container = document.getElementById('cartItemsContainer');
@@ -893,7 +934,7 @@ function viewCart() {
     let total = 0;
 
     cart.forEach((item, index) => {
-  total += item.price;
+  total += item.totalPrice || (item.price * item.quantity);
 
   const itemDiv = document.createElement('div');
   itemDiv.style.display = 'flex';
@@ -925,7 +966,7 @@ function viewCart() {
       quantityText.style.marginLeft = '10px';
 
       const priceSpan = document.createElement('span');
-      priceSpan.textContent = `$${item.price.toFixed(2)}`;
+      priceSpan.textContent = `$${(item.totalPrice || (item.price * item.quantity)).toFixed(2)} (${item.days || 1} day${(item.days > 1 ? 's' : '')})`;
       priceSpan.style.marginLeft = '10px';
       priceSpan.style.fontWeight = 'bold';
 
