@@ -206,43 +206,49 @@
     }
 
     function loadGallery() {
-      const galleryContainer = document.getElementById('adminGallery');
-      galleryContainer.innerHTML = '';
+  const galleryContainer = document.getElementById('adminGallery');
+  galleryContainer.innerHTML = '';
 
-      db.collection('gallery').orderBy('timestamp', 'desc').onSnapshot((querySnapshot) => {
-        galleryContainer.innerHTML = '';
-        const categories = {};
+  db.collection('gallery').orderBy('timestamp', 'desc').onSnapshot((querySnapshot) => {
+    galleryContainer.innerHTML = '';
+    const categories = {};
 
-        querySnapshot.forEach((doc) => {
-          const data = doc.data();
-          const category = data.category || 'Uncategorized';
+    querySnapshot.forEach((doc) => {
+      const data = doc.data();
+      const category = data.category || 'Uncategorized';
 
-          if (!categories[category]) categories[category] = [];
-          categories[category].push({ ...data, docId: doc.id });
-        });
+      if (!categories[category]) categories[category] = [];
+      categories[category].push({ ...data, docId: doc.id });
+    });
 
-        for (const category in categories) {
-          galleryContainer.innerHTML += `
-            <div class="gallery-category">
-              <h3>${category}</h3>
-              <div class="gallery-wrapper">
-                <div class="gallery-grid" id="gallery-${category}"></div>
-              </div>
+    for (const category in categories) {
+      galleryContainer.innerHTML += `
+        <div class="gallery-category">
+          <h3>${category}</h3>
+          <div class="gallery-wrapper">
+            <div class="gallery-grid" id="gallery-${category}"></div>
+          </div>
+        </div>
+      `;
+
+      const categoryContainer = document.getElementById(`gallery-${category}`);
+      categories[category].forEach(item => {
+        categoryContainer.innerHTML += `
+          <div style="position: relative; padding-bottom: 10px;">
+            <img src="${item.url}" alt="${item.name}">
+            <button class="remove-btn" onclick="removePhoto('${item.docId}')">X</button>
+
+            <div style="margin-top: 10px;">
+              <input type="text" value="${item.name}" id="name-${item.docId}" placeholder="Name" style="width: 100%; margin-top: 5px;" />
+              <input type="number" value="${item.price}" id="price-${item.docId}" placeholder="Price" style="width: 100%; margin-top: 5px;" />
+              <button onclick="updateItem('${item.docId}')">Save</button>
             </div>
-          `;
-
-          const categoryContainer = document.getElementById(`gallery-${category}`);
-          categories[category].forEach(item => {
-            categoryContainer.innerHTML += `
-              <div>
-                <img src="${item.url}" alt="${item.name}">
-                <button class="remove-btn" onclick="removePhoto('${item.docId}')">X</button>
-              </div>
-            `;
-          });
-        }
+          </div>
+        `;
       });
     }
+  });
+}
 
     function removePhoto(docId) {
       db.collection('gallery').doc(docId).delete().catch((error) => {
@@ -259,6 +265,29 @@
         window.location.href = 'index.html';
       }
     });
+
+    function updateItem(docId) {
+  const newName = document.getElementById(`name-${docId}`).value.trim();
+  const newPrice = parseFloat(document.getElementById(`price-${docId}`).value);
+
+  if (!newName || isNaN(newPrice)) {
+    alert("Please enter valid name and price.");
+    return;
+  }
+
+  db.collection('gallery').doc(docId).update({
+    name: newName,
+    price: newPrice
+  })
+  .then(() => {
+    alert("Item updated successfully.");
+  })
+  .catch(error => {
+    console.error("Error updating item: ", error);
+    alert("Error updating item: " + error.message);
+  });
+}
+
   </script>
 </body>
 </html>
