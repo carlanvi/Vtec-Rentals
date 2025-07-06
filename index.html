@@ -378,10 +378,10 @@
 
   <!-- Menu -->
   <div class="menu" id="menu">
-    <a onclick="showSection('gallerySection'); closeMenu();" href="javascript:void(0);">💒 WEDDING</a>
-       <a onclick="showSection('galler'); closeMenu();" href="javascript:void(0);">🏁 THRILL RIDES</a>
-       <a onclick="showSection('gallection'); closeMenu();" href="javascript:void(0);">🚍 PARTY BUS</a>
-       <a onclick="showSection('galleection'); closeMenu();" href="javascript:void(0);">🎉 PARTY ESSENTIALS</a>
+    <a onclick="loadGalleryByCategory('Thrill Rides'); closeMenu();" href="javascript:void(0);">🏁 THRILL RIDES</a>
+<a onclick="loadGalleryByCategory('Wedding'); closeMenu();" href="javascript:void(0);">💒 WEDDING</a>
+<a onclick="loadGalleryByCategory('Party Bus'); closeMenu();" href="javascript:void(0);">🚍 PARTY BUS</a>
+<a onclick="loadGalleryByCategory('Party Essentials'); closeMenu();" href="javascript:void(0);">🎉 PARTY ESSENTIALS</a>
     <a onclick="showSection('reviewsSection'); closeMenu();" href="javascript:void(0);">⭐️ REVIEWS</a>
     <a onclick="logoutUser(); closeMenu();" style="display:block; text-align:center; margin:10px auto; padding:10px 20px; background-color:red; color:white; border-radius:6px; cursor:pointer; text-decoration:none; width:80%; font-weight:bold;" href="javascript:void(0);">LOGOUT</a>
 
@@ -605,6 +605,56 @@ document.getElementById('reviewForm').addEventListener('submit', async (e) => {
     msg.textContent = "Error submitting review.";
   }
 });
+
+    function loadGalleryByCategory(categoryFilter) {
+  const galleryContainer = document.getElementById('galleryDisplay');
+  galleryContainer.innerHTML = '';
+
+  db.collection('gallery')
+    .where('category', '==', categoryFilter)
+    .get()
+    .then((querySnapshot) => {
+      if (querySnapshot.empty) {
+        galleryContainer.innerHTML = `<p style="text-align:center;">No items found in "${categoryFilter}".</p>`;
+        return;
+      }
+
+      galleryContainer.innerHTML = `
+        <div class="gallery-category">
+          <h3>${categoryFilter}</h3>
+          <div class="gallery-wrapper">
+            <div class="gallery-grid" id="gallery-${categoryFilter}"></div>
+          </div>
+        </div>
+      `;
+
+      const categoryContainer = document.getElementById(`gallery-${categoryFilter}`);
+
+      querySnapshot.forEach((doc) => {
+        const data = doc.data();
+        const imageUrl = data.url;
+        const name = data.name || 'Unnamed';
+        const price = data.price || 0;
+
+        categoryContainer.innerHTML += `
+          <div class="product-card">
+            <img src="${imageUrl}" alt="${name}">
+            <div class="product-info">
+              <div class="product-name">${name}</div>
+              <div class="product-price">$${price.toFixed(2)}</div>
+              <button onclick="addToCart('${name}', ${price}, '${imageUrl}')">Add to Cart</button>
+            </div>
+          </div>
+        `;
+      });
+    })
+    .catch((error) => {
+      console.error("Error loading gallery:", error);
+    });
+
+  showSection('gallerySection');
+}
+
 
 
     // Load reviews
