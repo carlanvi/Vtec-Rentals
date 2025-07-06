@@ -677,10 +677,16 @@ if (!snapshot.empty) {
 }
 
     msg.style.color = "green";
-    msg.textContent = "Thank you for your review!";
-    document.getElementById('reviewForm').reset();
-    selectedRating = 0;
-    document.querySelectorAll('#starRating span').forEach(s => s.style.color = '#ccc');
+msg.textContent = "Thank you for your review!";
+document.getElementById('reviewForm').reset();
+selectedRating = 0;
+document.querySelectorAll('#starRating span').forEach(s => s.style.color = '#ccc');
+
+// ✅ Refresh reviews immediately
+loadReviews();
+
+// ✅ Hide modal
+document.getElementById('reviewModal').style.display = 'none';
 
     // Optionally hide modal immediately after submitting review
     document.getElementById('reviewModal').style.display = 'none';
