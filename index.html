@@ -432,6 +432,16 @@
   <div id="cartModal">
     <div>
       <h2>Your Cart</h2>
+      <div style="margin-bottom: 10px;">
+  <label for="customerName"><strong>Your Name:</strong></label>
+  <input type="text" id="customerName" placeholder="Enter your name" style="width: 100%; padding: 10px;" required />
+</div>
+
+<div style="margin-bottom: 15px;">
+  <label for="customerPhone"><strong>Phone Number:</strong></label>
+  <input type="tel" id="customerPhone" placeholder="Enter phone number" style="width: 100%; padding: 10px;" required />
+</div>
+
       <div style="margin-bottom: 15px;">
   <label for="rentalDateRange"><strong>Select Rental Dates:</strong></label>
   <input id="rentalDateRange" placeholder="Select start and end date" style="width: 100%; padding: 10px;" />
@@ -1054,9 +1064,26 @@ document.getElementById('closeCartBtn').addEventListener('click', () => {
 });
 
 // Checkout click
-document.getElementById('checkoutBtn').addEventListener('click', () => {
-  alert("Checkout functionality is not implemented yet.");
+document.getElementById('checkoutBtn').addEventListener('click', async () => {
+  const name = document.getElementById("customerName").value.trim();
+  const phone = document.getElementById("customerPhone").value.trim();
+
+  if (!name || !phone) {
+    alert("Please enter your name and phone number before checking out.");
+    return;
+  }
+
+  // OPTIONAL: send to Firestore
+  // await db.collection("orders").add({ name, phone, ... });
+
+  alert(`Thank you, ${name}. Your booking has been received.`);
+
+  // Clear cart & reset form
+  localStorage.removeItem('cart');
+  updateCartCount();
+  document.getElementById('cartModal').style.display = 'none';
 });
+
 
     function showToast(message = "ADDED TO CART", type = "success") {
   const toast = document.getElementById('toast');
