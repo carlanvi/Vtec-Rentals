@@ -5,9 +5,6 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>VTEC RENTALS</title>
-  <button onclick="toggleLanguage()" id="langToggle" style="position: absolute; top: 20px; right: 20px; padding: 6px 12px;">
-  🇫🇮 Finnish
-</button>
 
   <!-- Firebase Scripts -->
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
@@ -623,55 +620,6 @@ document.getElementById('reviewForm').addEventListener('submit', async (e) => {
     msg.textContent = "Error submitting review.";
   }
 });
-
-    const translations = {
-  en: {
-    addToCart: "Add to Cart",
-    quantity: "Qty",
-    total: "Total",
-    cartEmpty: "Your cart is empty.",
-    checkout: "Checkout",
-    remove: "✖ Remove",
-    added: "Added to cart",
-    alreadyAdded: "You’ve already added this item"
-  },
-  fi: {
-    addToCart: "Lisää koriin",
-    quantity: "Määrä",
-    total: "Yhteensä",
-    cartEmpty: "Ostoskorisi on tyhjä.",
-    checkout: "Kassa",
-    remove: "✖ Poista",
-    added: "Lisätty koriin",
-    alreadyAdded: "Tämä tuote on jo lisätty"
-  }
-};
-
-let currentLang = "en";
-
-    function toggleLanguage() {
-  currentLang = currentLang === "en" ? "fi" : "en";
-
-  const button = document.getElementById('langToggle');
-  button.textContent = currentLang === "en" ? "🇫🇮 Finnish" : "🇬🇧 English";
-
-  updateLanguage();
-}
-
-    function updateLanguage() {
-  // Update static labels if you have IDs for them
-  document.querySelectorAll('[data-i18n]').forEach(elem => {
-    const key = elem.getAttribute('data-i18n');
-    elem.textContent = translations[currentLang][key] || key;
-  });
-
-  // Optionally update button text in product cards or modals
-  document.querySelectorAll('.add-to-cart-btn').forEach(btn => {
-    btn.textContent = translations[currentLang].addToCart;
-  });
-
-  document.getElementById("checkoutBtn").textContent = translations[currentLang].checkout;
-}
 
     function loadGalleryByCategory(categoryFilter) {
   const galleryContainer = document.getElementById('galleryDisplay');
