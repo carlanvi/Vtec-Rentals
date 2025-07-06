@@ -848,47 +848,51 @@ document.getElementById('reviewForm').addEventListener('submit', async (e) => {
 
     // Load reviews
     function loadReviews(user) {
-      const container = document.getElementById('reviewsContainer');
-      container.innerHTML = '';
+    const container = document.getElementById('reviewsContainer');
+container.innerHTML = ''; // Clear any existing reviews
 
-      db.collection('reviews').orderBy('timestamp', 'desc').get().then(snapshot => {
-        if (snapshot.empty) {
-          container.innerHTML = '<p>No reviews yet.</p>';
-          return;
-        }
+db.collection('reviews').orderBy('timestamp', 'desc').get().then(snapshot => {
+  if (snapshot.empty) {
+    container.innerHTML = '<p>No reviews yet.</p>';
+    return;
+  }
 
-        snapshot.forEach(doc => {
-          const data = doc.data();
-          const canDelete = user && data.uid === user.uid;
+  snapshot.forEach(doc => {
+    const data = doc.data();
+    const user = firebase.auth().currentUser; // Ensure user is defined here if not passed as an argument
+    const canDelete = user && data.uid === user.uid;
 
-          const reviewDiv = document.createElement('div');
-          reviewDiv.style.borderBottom = '1px solid #ddd';
-          reviewDiv.style.padding = '10px 0';
+    const reviewDiv = document.createElement('div');
+    reviewDiv.style.borderBottom = '1px solid #ddd';
+    reviewDiv.style.padding = '10px 0';
 
-          const stars = '★'.repeat(data.rating) + '☆'.repeat(5 - data.rating);
+    const stars = '★'.repeat(data.rating) + '☆'.repeat(5 - data.rating);
 
-          reviewDiv.innerHTML = `
-            <strong>${data.name}</strong> <span style="color: #f39c12;">${stars}</span><br/>
-            <p>${data.comment}</p>
-          `;
+    reviewDiv.innerHTML = `
+      <strong>${data.name}</strong> <span style="color: #f39c12;">${stars}</span><br/>
+      <p>${data.comment}</p>
+    `;
 
-          if (canDelete) {
-            const delBtn = document.createElement('button');
-            delBtn.textContent = 'Delete';
-            delBtn.style.backgroundColor = '#e74c3c';
-            delBtn.style.color = 'white';
-            delBtn.style.border = 'none';
-            delBtn.style.padding = '5px 10px';
-            delBtn.style.borderRadius = '4px';
-            delBtn.style.cursor = 'pointer';
-            delBtn.onclick = () => deleteReview(doc.id);
-            reviewDiv.appendChild(delBtn);
-          }
-
-          container.appendChild(reviewDiv);
-        });
-      });
+    if (canDelete) {
+      const delBtn = document.createElement('button');
+      delBtn.textContent = 'Delete';
+      delBtn.style.backgroundColor = '#e74c3c';
+      delBtn.style.color = 'white';
+      delBtn.style.border = 'none';
+      delBtn.style.padding = '5px 10px';
+      delBtn.style.borderRadius = '4px';
+      delBtn.style.cursor = 'pointer';
+      delBtn.onclick = () => deleteReview(doc.id); // Make sure deleteReview function exists
+      reviewDiv.appendChild(delBtn);
     }
+
+    container.appendChild(reviewDiv);
+  });
+}).catch(error => {
+  console.error('Error loading reviews:', error);
+  container.innerHTML = '<p>Error loading reviews.</p>';
+});
+
 
     // Delete review
     function deleteReview(docId) {
