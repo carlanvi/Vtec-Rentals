@@ -5,6 +5,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>VTEC RENTALS</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
 
   <!-- Firebase Scripts -->
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
@@ -426,18 +429,20 @@
   <div id="cartModal">
     <div>
       <h2>Your Cart</h2>
-      <div style="margin-bottom: 10px;">
-  <label>Start Date:</label>
-  <input type="date" id="rentalStartDate" onchange="updateRentalDuration()" required />
+      <div style="margin-bottom: 15px;">
+  <label for="rentalDateRange"><strong>Select Rental Dates:</strong></label>
+  <input id="rentalDateRange" placeholder="Select start and end date" style="width: 100%; padding: 10px;" />
+</div>
 
-  <label>Start Time:</label>
-  <input type="time" id="rentalStartTime" required />
-
-  <label style="margin-top: 10px;">End Date:</label>
-  <input type="date" id="rentalEndDate" onchange="updateRentalDuration()" required />
-
-  <label>End Time:</label>
-  <input type="time" id="rentalEndTime" required />
+<div style="display: flex; gap: 10px; margin-bottom: 10px;">
+  <div style="flex: 1;">
+    <label for="startTime">Start Time:</label>
+    <input type="time" id="startTime" style="width: 100%; padding: 10px;" />
+  </div>
+  <div style="flex: 1;">
+    <label for="endTime">End Time:</label>
+    <input type="time" id="endTime" style="width: 100%; padding: 10px;" />
+  </div>
 </div>
 
       <div id="cartItemsContainer"></div>
@@ -563,8 +568,34 @@
     }
 
     window.onload = function() {
-  loadGalleryByCategory('WEDDING'); // 👈 Load Wedding items by default
+  loadGalleryByCategory('WEDDING');
   updateCartCount();
+
+  flatpickr("#rentalDateRange", {
+    mode: "range",
+    dateFormat: "Y-m-d",
+    minDate: "today",
+    onClose: function(selectedDates) {
+      if (selectedDates.length === 2) {
+        const [start, end] = selectedDates;
+        const days = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
+        if (days < 1) {
+          alert("Minimum rental is 1 day.");
+          return;
+        }
+
+        let cart = JSON.parse(localStorage.getItem('cart')) || [];
+
+        cart.forEach(item => {
+          item.days = days;
+          item.totalPrice = item.price * days;
+        });
+
+        localStorage.setItem('cart', JSON.stringify(cart));
+        viewCart();
+      }
+    }
+  });
 };
 
     let selectedRating = 0;
