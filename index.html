@@ -665,15 +665,16 @@ document.getElementById('reviewForm').addEventListener('submit', async (e) => {
 
     // ✅ Now update the booking before anything else
     const snapshot = await db.collection('bookings')
-      .where('uid', '==', user.uid)
-      .where('reviewed', '==', false)
-      .orderBy('timestamp', 'desc')
-      .limit(1)
-      .get();
+  .where('uid', '==', user.uid)
+  .where('reviewed', '==', false)
+  .orderBy('timestamp', 'desc')
+  .limit(1)
+  .get();
 
-    for (let doc of snapshot.docs) {
-      await doc.ref.update({ reviewed: true });
-    }
+if (!snapshot.empty) {
+  const docRef = snapshot.docs[0].ref;
+  await docRef.update({ reviewed: true });
+}
 
     msg.style.color = "green";
     msg.textContent = "Thank you for your review!";
