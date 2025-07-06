@@ -654,7 +654,7 @@
       uid: user.uid
     });
 
-    // Update the booking to indicate the review has been made
+    // Now, update the booking if applicable
     const snapshot = await db.collection('bookings')
       .where('uid', '==', user.uid)
       .where('reviewed', '==', false)
@@ -681,11 +681,12 @@
     document.getElementById('reviewModal').style.display = 'none';
 
   } catch (error) {
-    console.error("Error submitting review or updating booking:", error);
+    console.error("Error submitting review:", error);
     msg.style.color = "red";
     msg.textContent = "Error submitting review.";
   }
 });
+
 
     function loadGalleryByCategory(categoryFilter) {
   const galleryContainer = document.getElementById('galleryDisplay');
