@@ -452,6 +452,8 @@
   transition: opacity 0.3s ease;
 ">Added to cart</div>
 
+  <div id="google_translate_element" style="position: fixed; bottom: 10px; right: 10px; z-index: 9999;"></div>
+
   <script>
     let currentUser = null;
 
@@ -998,35 +1000,17 @@ document.getElementById('checkoutBtn').addEventListener('click', () => {
   }, 2500);
 }
 
-    let currentLang = 'en';
-
-const translations = {
-  en: {
-    total: "Total",
-    cartEmpty: "Your cart is empty.",
-    checkout: "Checkout",
-    added: "Added to cart",
-    already: "Item already in cart",
-    addToCart: "Add to Cart"
-  },
-  fi: {
-    total: "Yhteensä",
-    cartEmpty: "Ostoskorisi on tyhjä.",
-    checkout: "Kassa",
-    added: "Lisätty koriin",
-    already: "Tämä tuote on jo lisätty",
-    addToCart: "Lisää koriin"
+    <script type="text/javascript">
+  function googleTranslateElementInit() {
+    new google.translate.TranslateElement({
+      pageLanguage: 'en',
+      includedLanguages: 'en,fi',
+      layout: google.translate.TranslateElement.InlineLayout.SIMPLE
+    }, 'google_translate_element');
   }
-};
+</script>
 
-function toggleLanguage() {
-  currentLang = currentLang === 'en' ? 'fi' : 'en';
-  document.getElementById('langToggle').textContent = currentLang === 'en' ? '🇫🇮 Finnish' : '🇬🇧 English';
-  document.querySelectorAll('[data-i18n]').forEach(el => {
-    const key = el.getAttribute('data-i18n');
-    el.textContent = translations[currentLang][key] || key;
-  });
-}
+<script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 
   </script>
 
