@@ -785,9 +785,7 @@ document.getElementById('reviewForm').addEventListener('submit', async (e) => {
   const itemId = name.replace(/\s+/g, '-');
   const qty = parseInt(document.getElementById(`qty-${itemId}`).value) || 1;
   const price = parseFloat(document.getElementById(`price-${itemId}`).textContent);
-const totalPrice = price; // only for 1 day, updated later
-
-cart.push({ name, price, imageUrl, quantity: qty, days: 1, totalPrice });
+  const totalPrice = price; // Only for 1 day — gets updated later if rental is longer
 
   let cart = JSON.parse(localStorage.getItem('cart')) || [];
 
@@ -798,19 +796,21 @@ cart.push({ name, price, imageUrl, quantity: qty, days: 1, totalPrice });
     return;
   }
 
-  // Update if same item but different quantity
+  // 🛠 Update if same item but different quantity
   const existingItem = cart.find(item => item.name === name);
   if (existingItem) {
     existingItem.quantity = qty;
     existingItem.price = price;
+    existingItem.totalPrice = totalPrice;
   } else {
-    cart.push({ name, price, imageUrl, quantity: qty });
+    cart.push({ name, price, imageUrl, quantity: qty, days: 1, totalPrice });
   }
 
   localStorage.setItem('cart', JSON.stringify(cart));
   updateCartCount();
   showToast("Added to cart", "success");
 }
+
 
     function updateManualPrice(itemId, priceMap) {
   const qty = document.getElementById(`qty-${itemId}`).value;
