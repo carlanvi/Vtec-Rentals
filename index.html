@@ -677,14 +677,14 @@ document.getElementById('reviewForm').addEventListener('submit', async (e) => {
       await docRef.update({ reviewed: true });
     }
 
-    // Update UI message and reset fields
+    // Success message and reset form
     msg.style.color = "green";
-    msg.textContent = "Thank you for your review!";
+    msg.textContent = "Review Submitted!";
     document.getElementById('reviewForm').reset();
     selectedRating = 0;
     document.querySelectorAll('#starRating span').forEach(s => s.style.color = '#ccc');
 
-    // ✅ Refresh reviews immediately after submission
+    // Refresh reviews immediately after submission
     loadReviews();
 
     // Hide the modal after successful submission
