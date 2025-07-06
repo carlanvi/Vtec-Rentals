@@ -362,6 +362,11 @@
       background-color: #999;
     }
 
+    input.error {
+  border: 2px solid red;
+  background-color: #fff4f4;
+}
+
   </style>
 </head>
 
@@ -1070,19 +1075,31 @@ document.getElementById('closeCartBtn').addEventListener('click', () => {
 
 // Checkout click
 document.getElementById('checkoutBtn').addEventListener('click', async () => {
-  const name = document.getElementById("customerName").value.trim();
-  const phone = document.getElementById("customerPhone").value.trim();
-  const location = document.getElementById("customerLocation").value.trim();
+  const nameField = document.getElementById("customerName");
+  const phoneField = document.getElementById("customerPhone");
+  const locationField = document.getElementById("customerLocation");
 
-  if (!name || !phone || !location) {
-    alert("Please enter your name, phone number, and location before checking out.");
+  let valid = true;
+
+  [nameField, phoneField, locationField].forEach(field => {
+    field.classList.remove("error"); // clear old errors
+    if (!field.value.trim()) {
+      field.classList.add("error");
+      valid = false;
+    }
+  });
+
+  if (!valid) {
+    nameField.focus(); // focus the first field (or you could scroll to it)
     return;
   }
 
   const cart = JSON.parse(localStorage.getItem('cart')) || [];
+  const name = nameField.value.trim();
+  const phone = phoneField.value.trim();
+  const location = locationField.value.trim();
 
-  // Example: save to Firestore if desired
-  // await db.collection("orders").add({ name, phone, location, cart });
+  // Save order, send to backend, etc. here if needed
 
   alert(`Thanks ${name}, we’ll deliver to: ${location}`);
 
