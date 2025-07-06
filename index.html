@@ -762,20 +762,6 @@ document.getElementById('reviewForm').addEventListener('submit', async (e) => {
   showToast("Added to cart", "success");
 }
 
-  // If item exists with different quantity, update it
-  const existingItem = cart.find(item => item.name === name);
-  if (existingItem) {
-    existingItem.quantity = qty;
-    existingItem.price = price;
-  } else {
-    cart.push({ name, price, imageUrl, quantity: qty });
-  }
-
-  localStorage.setItem('cart', JSON.stringify(cart));
-  updateCartCount();
-  alert(`${qty} x ${name} added to cart for $${price.toFixed(2)}`);
-}
-
     function updateManualPrice(itemId, priceMap) {
   const qty = document.getElementById(`qty-${itemId}`).value;
   const price = priceMap[qty] || 0;
