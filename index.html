@@ -784,10 +784,10 @@ document.getElementById('reviewForm').addEventListener('submit', async (e) => {
     function addToCartWithQty(name, _, imageUrl) {
   const itemId = name.replace(/\s+/g, '-');
   const qty = parseInt(document.getElementById(`qty-${itemId}`).value) || 1;
-  const price = parseFloat(document.getElementById(`price-${itemId}`).textContent);
-  const totalPrice = price; // Only for 1 day — updated later if multi-day
+  const price = parseFloat(document.getElementById(`price-${itemId}`).textContent.replace(/,/g, ''));
+  const totalPrice = price; // Only for 1 day — gets updated later if multi-day
 
-  let cart = JSON.parse(localStorage.getItem('cart')) || []; // ✅ Moved BEFORE using cart
+  let cart = JSON.parse(localStorage.getItem('cart')) || [];
 
   // 🔒 Prevent same item with same quantity
   const duplicate = cart.find(item => item.name === name && item.quantity === qty);
@@ -803,13 +803,14 @@ document.getElementById('reviewForm').addEventListener('submit', async (e) => {
     existingItem.price = price;
     existingItem.totalPrice = totalPrice;
   } else {
-    cart.push({ name, price, imageUrl, quantity: qty, days: 1, totalPrice }); // ✅ Only push if new
+    cart.push({ name, price, imageUrl, quantity: qty, days: 1, totalPrice });
   }
 
   localStorage.setItem('cart', JSON.stringify(cart));
   updateCartCount();
   showToast("Added to cart", "success");
 }
+
 
     function updateManualPrice(itemId, priceMap) {
   const qty = document.getElementById(`qty-${itemId}`).value;
