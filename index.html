@@ -654,7 +654,7 @@
       uid: user.uid
     });
 
-    // Now, update the booking if applicable
+    // Update the booking to indicate the review has been made
     const snapshot = await db.collection('bookings')
       .where('uid', '==', user.uid)
       .where('reviewed', '==', false)
@@ -667,12 +667,12 @@
       await docRef.update({ reviewed: true });
     }
 
-    // Success message and reset form
+    // Show success message
     msg.style.color = "green";
     msg.textContent = "Review Submitted!";
-    document.getElementById('reviewForm').reset();
-    selectedRating = 0;
-    document.querySelectorAll('#starRating span').forEach(s => s.style.color = '#ccc');
+    document.getElementById('reviewForm').reset(); // Reset form fields
+    selectedRating = 0; // Reset rating
+    document.querySelectorAll('#starRating span').forEach(s => s.style.color = '#ccc'); // Reset stars
 
     // Refresh reviews immediately after submission
     loadReviews();
@@ -681,7 +681,7 @@
     document.getElementById('reviewModal').style.display = 'none';
 
   } catch (error) {
-    console.error("Error submitting review:", error);
+    console.error("Error submitting review or updating booking:", error);
     msg.style.color = "red";
     msg.textContent = "Error submitting review.";
   }
