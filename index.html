@@ -436,6 +436,21 @@
     </div>
   </div>
 
+  <div id="toast" style="
+  display: none;
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  background-color: #28a745;
+  color: white;
+  padding: 12px 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  z-index: 9999;
+  font-weight: bold;
+  transition: opacity 0.3s ease;
+">Added to cart</div>
+
   <script>
     let currentUser = null;
 
@@ -726,13 +741,26 @@ document.getElementById('reviewForm').addEventListener('submit', async (e) => {
 
   let cart = JSON.parse(localStorage.getItem('cart')) || [];
 
-  // 🔒 Check for existing same item with same quantity
+  // 🔒 Prevent same item with same quantity
   const duplicate = cart.find(item => item.name === name && item.quantity === qty);
-
   if (duplicate) {
-    alert(`You’ve already added ${qty} ${name}.`);
+    showToast("Item already in cart", "error"); // Use error style
     return;
   }
+
+  // Update if same item but different quantity
+  const existingItem = cart.find(item => item.name === name);
+  if (existingItem) {
+    existingItem.quantity = qty;
+    existingItem.price = price;
+  } else {
+    cart.push({ name, price, imageUrl, quantity: qty });
+  }
+
+  localStorage.setItem('cart', JSON.stringify(cart));
+  updateCartCount();
+  showToast("Added to cart", "success");
+}
 
   // If item exists with different quantity, update it
   const existingItem = cart.find(item => item.name === name);
@@ -963,6 +991,25 @@ document.getElementById('closeCartBtn').addEventListener('click', () => {
 document.getElementById('checkoutBtn').addEventListener('click', () => {
   alert("Checkout functionality is not implemented yet.");
 });
+
+    function showToast(message = "Added to cart", type = "success") {
+  const toast = document.getElementById('toast');
+  toast.textContent = message;
+
+  // Color by type
+  toast.style.backgroundColor = type === "error" ? "#dc3545" : "#28a745"; // red or green
+
+  toast.style.display = 'block';
+  toast.style.opacity = '1';
+
+  setTimeout(() => {
+    toast.style.opacity = '0';
+  }, 2000);
+
+  setTimeout(() => {
+    toast.style.display = 'none';
+  }, 2500);
+}
 
   </script>
 
