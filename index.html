@@ -635,12 +635,28 @@ document.getElementById('reviewForm').addEventListener('submit', async (e) => {
         const imageUrl = data.url;
         const name = data.name || 'Unnamed';
         const price = data.price || 0;
-
-        // Sanitize name for ID
         const itemId = name.replace(/\s+/g, '-');
 
-        // Only show quantity selector for Wedding or Event Setup
-        const isBulk = categoryFilter.toUpperCase() === 'WEDDING' || categoryFilter.toUpperCase() === 'EVENT SETUP';
+        // Define per-item quantity options
+        const qtyMap = {
+          "Chairs": [10, 20, 50, 100],
+          "Tables": [2, 4, 6],
+          "Podium": [1, 2, 3],
+          "Plates": [10, 20, 30, 50],
+          "Lights": [1, 5, 10],
+          "Beach Umbrella": [1, 2, 4],
+          "Bluetooth Speaker": [1, 2],
+          "Tents": [1, 2, 3],
+          "Portable Bar": [1, 2],
+          "Outdoor Fan": [1, 2, 4],
+          "Warm Pan": [2, 4, 6]
+        };
+
+        let quantityOptions = qtyMap[name] || [1]; // Default to [1] if not found
+
+        const optionsHTML = quantityOptions.map(qty =>
+          `<option value="${qty}">${qty}</option>`
+        ).join('');
 
         categoryContainer.innerHTML += `
           <div class="product-card">
@@ -648,18 +664,10 @@ document.getElementById('reviewForm').addEventListener('submit', async (e) => {
             <div class="product-info">
               <div class="product-name">${name}</div>
               <div class="product-price">$${price.toFixed(2)}</div>
-              ${isBulk ? `
-                <select id="qty-${itemId}" style="margin-bottom: 8px;">
-                  <option value="1">1</option>
-                  <option value="5">5</option>
-                  <option value="10">10</option>
-                  <option value="15">15</option>
-                  <option value="20">20</option>
-                </select>
-                <button onclick="addToCartWithQty('${name}', ${price}, '${imageUrl}')">Add to Cart</button>
-              ` : `
-                <button onclick="addToCart('${name}', ${price}, '${imageUrl}')">Add to Cart</button>
-              `}
+              <select id="qty-${itemId}" style="margin-bottom: 8px;">
+                ${optionsHTML}
+              </select>
+              <button onclick="addToCartWithQty('${name}', ${price}, '${imageUrl}')">Add to Cart</button>
             </div>
           </div>
         `;
