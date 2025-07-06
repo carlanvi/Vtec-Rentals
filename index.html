@@ -610,6 +610,53 @@ document.getElementById('reviewForm').addEventListener('submit', async (e) => {
   const galleryContainer = document.getElementById('galleryDisplay');
   galleryContainer.innerHTML = '';
 
+  const qtyMap = {
+    "CROSSBACK CHAIRS": {
+      options: [10, 20, 50, 100],
+      prices: { 10: 30, 20: 55, 50: 120, 100: 200 }
+    },
+    "PLASTIC TABLES": {
+      options: [2, 4, 6],
+      prices: { 2: 20, 4: 35, 6: 50 }
+    },
+    "Podium": {
+      options: [1, 2, 3],
+      prices: { 1: 15, 2: 28, 3: 40 }
+    },
+    "Plates": {
+      options: [10, 20, 30, 50],
+      prices: { 10: 10, 20: 18, 30: 25, 50: 35 }
+    },
+    "Lights": {
+      options: [1, 5, 10],
+      prices: { 1: 10, 5: 45, 10: 80 }
+    },
+    "Beach Umbrella": {
+      options: [1, 2, 4],
+      prices: { 1: 12, 2: 20, 4: 35 }
+    },
+    "Bluetooth Speaker": {
+      options: [1, 2],
+      prices: { 1: 30, 2: 55 }
+    },
+    "Tents": {
+      options: [1, 2, 3],
+      prices: { 1: 100, 2: 180, 3: 250 }
+    },
+    "Portable Bar": {
+      options: [1, 2],
+      prices: { 1: 50, 2: 90 }
+    },
+    "Outdoor Fan": {
+      options: [1, 2, 4],
+      prices: { 1: 15, 2: 25, 4: 40 }
+    },
+    "Warm Pan": {
+      options: [2, 4, 6],
+      prices: { 2: 10, 4: 18, 6: 25 }
+    }
+  };
+
   db.collection('gallery')
     .where('category', '==', categoryFilter)
     .get()
@@ -634,25 +681,15 @@ document.getElementById('reviewForm').addEventListener('submit', async (e) => {
         const data = doc.data();
         const imageUrl = data.url;
         const name = data.name || 'Unnamed';
-        const price = data.price || 0;
         const itemId = name.replace(/\s+/g, '-');
 
-        // Define per-item quantity options
-        const qtyMap = {
-          "CROSSBACK CHAIRS": [10, 20, 50, 100],
-          "PLASTIC TABLES": [2, 4, 6],
-          "Podium": [1, 2, 3],
-          "Plates": [10, 20, 30, 50],
-          "Lights": [1, 5, 10],
-          "Beach Umbrella": [1, 2, 4],
-          "Bluetooth Speaker": [1, 2],
-          "Tents": [1, 2, 3],
-          "Portable Bar": [1, 2],
-          "Outdoor Fan": [1, 2, 4],
-          "Warm Pan": [2, 4, 6]
-        };
+        let quantityOptions = [1];
+        let quantityPrices = { 1: data.price || 0 };
 
-        let quantityOptions = qtyMap[name] || [1]; // Default to [1] if not found
+        if (qtyMap[name]) {
+          quantityOptions = qtyMap[name].options;
+          quantityPrices = qtyMap[name].prices;
+        }
 
         const optionsHTML = quantityOptions.map(qty =>
           `<option value="${qty}">${qty}</option>`
@@ -663,11 +700,13 @@ document.getElementById('reviewForm').addEventListener('submit', async (e) => {
             <img src="${imageUrl}" alt="${name}">
             <div class="product-info">
               <div class="product-name">${name}</div>
-              <div class="product-price">$${price.toFixed(2)}</div>
-              <select id="qty-${itemId}" style="margin-bottom: 8px;">
+              <div class="product-price">
+                Total: $<span id="price-${itemId}">${quantityPrices[quantityOptions[0]].toFixed(2)}</span>
+              </div>
+              <select id="qty-${itemId}" onchange="updateManualPrice('${itemId}', ${JSON.stringify(quantityPrices).replace(/"/g, '&quot;')})">
                 ${optionsHTML}
               </select>
-              <button onclick="addToCartWithQty('${name}', ${price}, '${imageUrl}')">Add to Cart</button>
+              <button onclick="addToCartWithQty('${name}', 0, '${imageUrl}')">Add to Cart</button>
             </div>
           </div>
         `;
@@ -680,20 +719,35 @@ document.getElementById('reviewForm').addEventListener('submit', async (e) => {
   showSection('gallerySection');
 }
 
-    function addToCartWithQty(name, price, imageUrl) {
-  const qtyInput = document.getElementById(`qty-${name.replace(/\s+/g, '-')}`);
-  const quantity = parseInt(qtyInput.value) || 1;
+    function addToCartWithQty(name, _, imageUrl) {
+  const itemId = name.replace(/\s+/g, '-');
+  const qty = parseInt(document.getElementById(`qty-${itemId}`).value) || 1;
+  const price = parseFloat(document.getElementById(`price-${itemId}`).textContent);
 
   let cart = JSON.parse(localStorage.getItem('cart')) || [];
   const existingItem = cart.find(item => item.name === name);
   if (existingItem) {
-    existingItem.quantity += quantity;
+    existingItem.quantity += qty;
+    existingItem.price += price;
   } else {
-    cart.push({ name, price, imageUrl, quantity });
+    cart.push({ name, price, imageUrl, quantity: qty });
   }
+
   localStorage.setItem('cart', JSON.stringify(cart));
   updateCartCount();
-  alert(`${quantity} x ${name} added to cart.`);
+  alert(`${qty} x ${name} added to cart for $${price.toFixed(2)}`);
+}
+
+    function updateManualPrice(itemId, priceMap) {
+  const qty = document.getElementById(`qty-${itemId}`).value;
+  const price = priceMap[qty] || 0;
+  document.getElementById(`price-${itemId}`).textContent = price.toFixed(2);
+}
+
+    function updatePrice(itemId, basePrice) {
+  const qty = parseInt(document.getElementById(`qty-${itemId}`).value) || 1;
+  const total = qty * basePrice;
+  document.getElementById(`price-${itemId}`).textContent = total.toFixed(2);
 }
 
     // Load reviews
