@@ -387,8 +387,6 @@
     <a onclick="login(); closeMenu();" class="admin-button" style="display:block; text-align:center; margin:10px auto; padding:10px 20px; background-color:#6200ea; color:white; border-radius:6px; text-decoration:none; width:80%; font-weight:bold;" href="javascript:void(0);">ADMIN</a>
   </div>
 
-  <div id="google_translate_element" style="position: fixed; bottom: 10px; right: 10px; z-index: 9999;"></div>
-
   <!-- Reviews Section -->
   <div id="reviewsSection" class="content-section" style="padding-top: 32.7px; background-color: black; color: white;">
 
@@ -999,19 +997,6 @@ document.getElementById('checkoutBtn').addEventListener('click', () => {
     toast.style.display = 'none';
   }, 2500);
 }
-
-<!-- Google Translate script -->
-<script type="text/javascript">
-  function googleTranslateElementInit() {
-    new google.translate.TranslateElement({
-      pageLanguage: 'en',
-      includedLanguages: 'en,fi',
-      layout: google.translate.TranslateElement.InlineLayout.SIMPLE
-    }, 'google_translate_element');
-  }
-</script>
-
-<script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
-
+  </script>
   </body>
 </html>
