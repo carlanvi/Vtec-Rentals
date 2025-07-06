@@ -383,6 +383,7 @@
     <a onclick="loadGalleryByCategory('EVENT SETUP'); closeMenu();" href="javascript:void(0);">🎉 EVENT SETUP</a>
 <a onclick="loadGalleryByCategory('PARTY BUS'); closeMenu();" href="javascript:void(0);">🚍 PARTY BUS</a>
     <a onclick="showSection('reviewsSection'); closeMenu();" href="javascript:void(0);">⭐️ REVIEWS</a>
+    <button onclick="toggleLanguage()" id="langToggle">🇫🇮 Finnish</button>
     <a onclick="logoutUser(); closeMenu();" style="display:block; text-align:center; margin:10px auto; padding:10px 20px; background-color:red; color:white; border-radius:6px; cursor:pointer; text-decoration:none; width:80%; font-weight:bold;" href="javascript:void(0);">LOGOUT</a>
 
     <a onclick="login(); closeMenu();" class="admin-button" style="display:block; text-align:center; margin:10px auto; padding:10px 20px; background-color:#6200ea; color:white; border-radius:6px; text-decoration:none; width:80%; font-weight:bold;" href="javascript:void(0);">ADMIN</a>
@@ -995,6 +996,36 @@ document.getElementById('checkoutBtn').addEventListener('click', () => {
   setTimeout(() => {
     toast.style.display = 'none';
   }, 2500);
+}
+
+    let currentLang = 'en';
+
+const translations = {
+  en: {
+    total: "Total",
+    cartEmpty: "Your cart is empty.",
+    checkout: "Checkout",
+    added: "Added to cart",
+    already: "Item already in cart",
+    addToCart: "Add to Cart"
+  },
+  fi: {
+    total: "Yhteensä",
+    cartEmpty: "Ostoskorisi on tyhjä.",
+    checkout: "Kassa",
+    added: "Lisätty koriin",
+    already: "Tämä tuote on jo lisätty",
+    addToCart: "Lisää koriin"
+  }
+};
+
+function toggleLanguage() {
+  currentLang = currentLang === 'en' ? 'fi' : 'en';
+  document.getElementById('langToggle').textContent = currentLang === 'en' ? '🇫🇮 Finnish' : '🇬🇧 English';
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n');
+    el.textContent = translations[currentLang][key] || key;
+  });
 }
 
   </script>
