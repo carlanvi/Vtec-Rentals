@@ -647,16 +647,6 @@ document.getElementById('reviewForm').addEventListener('submit', async (e) => {
 
   // Proceed with the rest of the submission logic here
   try {
-    // Firebase Firestore logic to submit the review
-    // (submit review to Firestore or handle accordingly)
-  } catch (error) {
-    console.error("Error submitting review:", error);
-    msg.style.color = "red";
-    msg.textContent = "Error submitting review.";
-  }
-});
-
-  try {
     // Add the review to Firestore
     await db.collection('reviews').add({
       name,
