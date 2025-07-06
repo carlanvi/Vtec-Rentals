@@ -625,7 +625,7 @@
     let selectedRating = 0;
 
     // Star rating UI logic
-    document.getElementById('reviewForm').addEventListener('submit', async (e) => {
+document.getElementById('reviewForm').addEventListener('submit', async (e) => {
   e.preventDefault();
 
   const user = firebase.auth().currentUser;
@@ -667,12 +667,12 @@
       await docRef.update({ reviewed: true });
     }
 
-    // Show success message
+    // Success message and reset form
     msg.style.color = "green";
     msg.textContent = "Review Submitted!";
-    document.getElementById('reviewForm').reset(); // Reset form fields
-    selectedRating = 0; // Reset rating
-    document.querySelectorAll('#starRating span').forEach(s => s.style.color = '#ccc'); // Reset stars
+    document.getElementById('reviewForm').reset();
+    selectedRating = 0;
+    document.querySelectorAll('#starRating span').forEach(s => s.style.color = '#ccc');
 
     // Refresh reviews immediately after submission
     loadReviews();
@@ -686,6 +686,7 @@
     msg.textContent = "Error submitting review.";
   }
 });
+
 
 
     function loadGalleryByCategory(categoryFilter) {
