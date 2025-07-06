@@ -868,14 +868,14 @@ function viewCart() {
     let total = 0;
 
     cart.forEach((item, index) => {
-      total += item.price * item.quantity;
+  total += item.price;
 
-      const itemDiv = document.createElement('div');
-      itemDiv.style.display = 'flex';
-      itemDiv.style.alignItems = 'center';
-      itemDiv.style.justifyContent = 'space-between';
-      itemDiv.style.padding = '8px 0';
-      itemDiv.style.borderBottom = '1px solid #eee';
+  const itemDiv = document.createElement('div');
+  itemDiv.style.display = 'flex';
+  itemDiv.style.alignItems = 'center';
+  itemDiv.style.justifyContent = 'space-between';
+  itemDiv.style.padding = '8px 0';
+  itemDiv.style.borderBottom = '1px solid #eee';
 
       const img = document.createElement('img');
       img.src = item.imageUrl;
