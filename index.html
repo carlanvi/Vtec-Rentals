@@ -889,34 +889,41 @@ function viewCart() {
       const infoDiv = document.createElement('div');
       infoDiv.style.flexGrow = '1';
       infoDiv.style.display = 'flex';
-      infoDiv.style.flexDirection = 'column';
+      infoDiv.style.alignItems = 'center';
+      infoDiv.style.justifyContent = 'space-between';
 
       const nameSpan = document.createElement('span');
       nameSpan.textContent = item.name;
 
-      const qtySpan = document.createElement('span');
-      qtySpan.textContent = `Quantity: ${item.quantity}`;
+      const quantityText = document.createElement('span');
+      quantityText.textContent = `Qty: ${item.quantity}`;
+      quantityText.style.marginLeft = '10px';
 
       const priceSpan = document.createElement('span');
-      priceSpan.textContent = `Total: $${(item.price).toFixed(2)}`;
+      priceSpan.textContent = `$${(item.price * item.quantity).toFixed(2)}`;
+      priceSpan.style.marginLeft = '10px';
       priceSpan.style.fontWeight = 'bold';
-      priceSpan.style.marginTop = '4px';
 
-      // Remove button
+      const controlsDiv = document.createElement('div');
+      controlsDiv.style.display = 'flex';
+      controlsDiv.style.alignItems = 'center';
+
+      // Remove button only
       const removeBtn = document.createElement('button');
-      removeBtn.textContent = '✖ Remove';
+      removeBtn.textContent = '✖';
       removeBtn.style.color = 'red';
-      removeBtn.style.marginTop = '6px';
-      removeBtn.style.alignSelf = 'flex-start';
+      removeBtn.style.marginLeft = '8px';
       removeBtn.onclick = () => removeItem(index);
 
+      controlsDiv.appendChild(quantityText);
+      controlsDiv.appendChild(removeBtn);
+
       infoDiv.appendChild(nameSpan);
-      infoDiv.appendChild(qtySpan);
       infoDiv.appendChild(priceSpan);
-      infoDiv.appendChild(removeBtn);
 
       itemDiv.appendChild(img);
       itemDiv.appendChild(infoDiv);
+      itemDiv.appendChild(controlsDiv);
 
       container.appendChild(itemDiv);
     });
