@@ -725,10 +725,20 @@ document.getElementById('reviewForm').addEventListener('submit', async (e) => {
   const price = parseFloat(document.getElementById(`price-${itemId}`).textContent);
 
   let cart = JSON.parse(localStorage.getItem('cart')) || [];
+
+  // 🔒 Check for existing same item with same quantity
+  const duplicate = cart.find(item => item.name === name && item.quantity === qty);
+
+  if (duplicate) {
+    alert(`You’ve already added ${qty} ${name}.`);
+    return;
+  }
+
+  // If item exists with different quantity, update it
   const existingItem = cart.find(item => item.name === name);
   if (existingItem) {
-    existingItem.quantity += qty;
-    existingItem.price += price;
+    existingItem.quantity = qty;
+    existingItem.price = price;
   } else {
     cart.push({ name, price, imageUrl, quantity: qty });
   }
