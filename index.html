@@ -655,6 +655,7 @@ document.getElementById('reviewForm').addEventListener('submit', async (e) => {
   }
 
   try {
+    // Add the review to Firestore
     await db.collection('reviews').add({
       name,
       comment,
@@ -663,32 +664,30 @@ document.getElementById('reviewForm').addEventListener('submit', async (e) => {
       uid: user.uid
     });
 
-    // ✅ Now update the booking before anything else
+    // Update the booking to indicate the review has been made
     const snapshot = await db.collection('bookings')
-  .where('uid', '==', user.uid)
-  .where('reviewed', '==', false)
-  .orderBy('timestamp', 'desc')
-  .limit(1)
-  .get();
+      .where('uid', '==', user.uid)
+      .where('reviewed', '==', false)
+      .orderBy('timestamp', 'desc')
+      .limit(1)
+      .get();
 
-if (!snapshot.empty) {
-  const docRef = snapshot.docs[0].ref;
-  await docRef.update({ reviewed: true });
-}
+    if (!snapshot.empty) {
+      const docRef = snapshot.docs[0].ref;
+      await docRef.update({ reviewed: true });
+    }
 
+    // Update UI message and reset fields
     msg.style.color = "green";
-msg.textContent = "Thank you for your review!";
-document.getElementById('reviewForm').reset();
-selectedRating = 0;
-document.querySelectorAll('#starRating span').forEach(s => s.style.color = '#ccc');
+    msg.textContent = "Thank you for your review!";
+    document.getElementById('reviewForm').reset();
+    selectedRating = 0;
+    document.querySelectorAll('#starRating span').forEach(s => s.style.color = '#ccc');
 
-// ✅ Refresh reviews immediately
-loadReviews();
+    // ✅ Refresh reviews immediately after submission
+    loadReviews();
 
-// ✅ Hide modal
-document.getElementById('reviewModal').style.display = 'none';
-
-    // Optionally hide modal immediately after submitting review
+    // Hide the modal after successful submission
     document.getElementById('reviewModal').style.display = 'none';
 
   } catch (error) {
