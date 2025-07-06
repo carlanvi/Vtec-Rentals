@@ -636,13 +636,30 @@ document.getElementById('reviewForm').addEventListener('submit', async (e) => {
         const name = data.name || 'Unnamed';
         const price = data.price || 0;
 
+        // Sanitize name for ID
+        const itemId = name.replace(/\s+/g, '-');
+
+        // Only show quantity selector for Wedding or Event Setup
+        const isBulk = categoryFilter.toUpperCase() === 'WEDDING' || categoryFilter.toUpperCase() === 'EVENT SETUP';
+
         categoryContainer.innerHTML += `
           <div class="product-card">
             <img src="${imageUrl}" alt="${name}">
             <div class="product-info">
               <div class="product-name">${name}</div>
               <div class="product-price">$${price.toFixed(2)}</div>
-              <button onclick="addToCart('${name}', ${price}, '${imageUrl}')">Add to Cart</button>
+              ${isBulk ? `
+                <select id="qty-${itemId}" style="margin-bottom: 8px;">
+                  <option value="1">1</option>
+                  <option value="5">5</option>
+                  <option value="10">10</option>
+                  <option value="15">15</option>
+                  <option value="20">20</option>
+                </select>
+                <button onclick="addToCartWithQty('${name}', ${price}, '${imageUrl}')">Add to Cart</button>
+              ` : `
+                <button onclick="addToCart('${name}', ${price}, '${imageUrl}')">Add to Cart</button>
+              `}
             </div>
           </div>
         `;
@@ -655,7 +672,21 @@ document.getElementById('reviewForm').addEventListener('submit', async (e) => {
   showSection('gallerySection');
 }
 
+    function addToCartWithQty(name, price, imageUrl) {
+  const qtyInput = document.getElementById(`qty-${name.replace(/\s+/g, '-')}`);
+  const quantity = parseInt(qtyInput.value) || 1;
 
+  let cart = JSON.parse(localStorage.getItem('cart')) || [];
+  const existingItem = cart.find(item => item.name === name);
+  if (existingItem) {
+    existingItem.quantity += quantity;
+  } else {
+    cart.push({ name, price, imageUrl, quantity });
+  }
+  localStorage.setItem('cart', JSON.stringify(cart));
+  updateCartCount();
+  alert(`${quantity} x ${name} added to cart.`);
+}
 
     // Load reviews
     function loadReviews(user) {
