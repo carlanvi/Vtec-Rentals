@@ -744,7 +744,7 @@ document.getElementById('reviewForm').addEventListener('submit', async (e) => {
   // 🔒 Prevent same item with same quantity
   const duplicate = cart.find(item => item.name === name && item.quantity === qty);
   if (duplicate) {
-    showToast("Item already in cart", "error"); // Use error style
+    showToast("MAXIMUM AMOUNT REACHED", "error"); // Use error style
     return;
   }
 
@@ -978,7 +978,7 @@ document.getElementById('checkoutBtn').addEventListener('click', () => {
   alert("Checkout functionality is not implemented yet.");
 });
 
-    function showToast(message = "Added to cart", type = "success") {
+    function showToast(message = "ADDED TO CART", type = "success") {
   const toast = document.getElementById('toast');
   toast.textContent = message;
 
