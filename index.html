@@ -517,78 +517,86 @@
     });
 
     function login() {
-      const email = prompt('Enter admin email:');
-      const password = prompt('Enter admin password:');
+  const email = prompt('Enter admin email:');
+  const password = prompt('Enter admin password:');
 
-      firebase.auth().signInWithEmailAndPassword(email, password)
-        .then(() => {
-          window.location.href = 'dashboard.html';
-        })
-        .catch((error) => {
-          alert('Authentication failed: ' + error.message);
-        });
-    }
+  firebase.auth().signInWithEmailAndPassword(email, password)
+    .then(() => {
+      window.location.href = 'dashboard.html';
+    })
+    .catch((error) => {
+      let errorMessage = 'Authentication failed: ' + error.message;
+      if (error.code === 'auth/wrong-password') {
+        errorMessage = 'Incorrect password. Please try again.';
+      } else if (error.code === 'auth/user-not-found') {
+        errorMessage = 'No user found with this email. Please check and try again.';
+      }
+      alert(errorMessage);
+    });
+}
 
-    function toggleMenu() {
-      const menu = document.getElementById('menu');
-      menu.classList.toggle('show');
-    }
+function toggleMenu() {
+  const menu = document.getElementById('menu');
+  menu.classList.toggle('show');
+}
 
-    function closeMenu() {
-      const menu = document.getElementById('menu');
-      menu.classList.remove('show');
-    }
+function closeMenu() {
+  const menu = document.getElementById('menu');
+  menu.classList.remove('show');
+}
 
-    function loadGallery(containerId) {
-      const galleryContainer = document.getElementById(containerId);
-      galleryContainer.innerHTML = '';
+function loadGallery(containerId) {
+  const galleryContainer = document.getElementById(containerId);
+  galleryContainer.innerHTML = '';
 
-      db.collection('gallery').onSnapshot((querySnapshot) => {
-        galleryContainer.innerHTML = '';
+  db.collection('gallery').onSnapshot((querySnapshot) => {
+    const categories = {};
 
-        const categories = {};
+    querySnapshot.forEach((doc) => {
+      const data = doc.data();
+      const imageUrl = data.url;
+      const name = data.name || 'Unnamed';
+      const price = data.price || 0;
+      const category = data.category || 'Uncategorized';
 
-        querySnapshot.forEach((doc) => {
-          const data = doc.data();
-          const imageUrl = data.url;
-          const name = data.name || 'Unnamed';
-          const price = data.price || 0;
-          const category = data.category || 'Uncategorized';
+      if (!categories[category]) {
+        categories[category] = [];
+      }
+      categories[category].push({ imageUrl, name, price });
+    });
 
-          if (!categories[category]) {
-            categories[category] = [];
-          }
-          categories[category].push({ imageUrl, name, price });
-        });
+    let galleryHTML = '';
 
-        for (const category in categories) {
-          galleryContainer.innerHTML += `
-            <div class="gallery-category">
-              <h3>${category}</h3>
-              <div class="gallery-wrapper">
-                <div class="gallery-grid" id="gallery-${category}"></div>
-              </div>
+    for (const category in categories) {
+      galleryHTML += `
+        <div class="gallery-category">
+          <h3>${category}</h3>
+          <div class="gallery-wrapper">
+            <div class="gallery-grid" id="gallery-${category}"></div>
+          </div>
+        </div>
+      `;
+
+      const categoryContainer = document.getElementById(`gallery-${category}`);
+      categories[category].forEach((item) => {
+        categoryContainer.innerHTML += `
+          <div class="product-card">
+            <img src="${item.imageUrl}" alt="${item.name}">
+            <div class="product-info">
+              <div class="product-name">${item.name}</div>
+              <div class="product-price">$${item.price.toFixed(2)}</div>
+              <button onclick="addToCart('${item.name}', ${item.price}, '${item.imageUrl}')">Add to Cart</button>
             </div>
-          `;
-
-          const categoryContainer = document.getElementById(`gallery-${category}`);
-          categories[category].forEach((item) => {
-            categoryContainer.innerHTML += `
-              <div class="product-card">
-                <img src="${item.imageUrl}" alt="${item.name}">
-                <div class="product-info">
-                  <div class="product-name">${item.name}</div>
-                  <div class="product-price">$${item.price.toFixed(2)}</div>
-                  <button onclick="addToCart('${item.name}', ${item.price}, '${item.imageUrl}')">Add to Cart</button>
-                </div>
-              </div>
-            `;
-          });
-        }
+          </div>
+        `;
       });
     }
 
-    window.onload = function() {
+    galleryContainer.innerHTML = galleryHTML;  // Efficiently inject the full HTML after building it
+  });
+}
+
+window.onload = function() {
   loadGalleryByCategory('EVENT SETUP');
   updateCartCount();
 
@@ -600,7 +608,7 @@
       if (selectedDates.length === 2) {
         const [start, end] = selectedDates;
         let days = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
-        days = Math.max(days, 1); // ensure at least 1 day charge
+        days = Math.max(days, 1); // Ensure at least 1 day charge
         if (days < 1) {
           alert("Minimum rental is 1 day.");
           return;
@@ -681,7 +689,6 @@ document.getElementById('reviewForm').addEventListener('submit', async (e) => {
   }
 });
 
-
 // Function to load and display reviews
 function loadReviews(user) {
   const container = document.getElementById('reviewsContainer');
@@ -716,57 +723,49 @@ function loadReviews(user) {
         delBtn.style.backgroundColor = '#e74c3c';
         delBtn.style.color = 'white';
         delBtn.style.border = 'none';
-// Star rating UI logic
-document.querySelectorAll('#starRating span').forEach(star => {
-  star.addEventListener('click', () => {
-    selectedRating = parseInt(star.getAttribute('data-value'));
-    document.querySelectorAll('#starRating span').forEach(s => {
-      s.style.color = parseInt(s.getAttribute('data-value')) <= selectedRating ? '#f39c12' : '#ccc';
+        delBtn.style.padding = '5px 10px';
+        delBtn.style.borderRadius = '4px';
+        delBtn.style.cursor = 'pointer';
+
+        delBtn.addEventListener('click', () => deleteReview(doc.id)); // Add delete logic
+
+        reviewDiv.appendChild(delBtn); // Append the delete button
+      }
+
+      container.appendChild(reviewDiv);
     });
+  }).catch(error => {
+    console.error('Error loading reviews:', error);
+    container.innerHTML = '<p>Error loading reviews.</p>';
   });
-});
+}
 
-// Submit review
-document.getElementById('reviewForm').addEventListener('submit', async (e) => {
-  e.preventDefault();
-
+// Function to delete review
+function deleteReview(docId) {
   const user = firebase.auth().currentUser;
   if (!user) {
-    alert("You must be logged in to submit a review.");
+    alert('You must be logged in to delete reviews.');
     return;
   }
 
-  const name = document.getElementById('reviewName').value.trim();
-  const comment = document.getElementById('reviewComment').value.trim();
-  const msg = document.getElementById('reviewSubmitMsg');
-
-  if (!name || !comment || selectedRating === 0) {
-    msg.style.color = "red";
-    msg.textContent = "Please fill all fields and select a star rating.";
-    return;
-  }
-
-  try {
-    await db.collection('reviews').add({
-      name,
-      comment,
-      rating: selectedRating,
-      timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-      uid: user.uid
+  if (confirm("Are you sure you want to delete this review?")) {
+    db.collection('reviews').doc(docId).get().then(doc => {
+      if (doc.exists && doc.data().uid === user.uid) {
+        db.collection('reviews').doc(docId).delete()
+          .then(() => {
+            alert('Review deleted.');
+            loadReviews(user); // Reload reviews after deletion
+          })
+          .catch(error => {
+            alert('Error deleting review: ' + error.message);
+          });
+      } else {
+        alert("You can only delete your own reviews.");
+      }
     });
-
-    msg.style.color = "green";
-    msg.textContent = "Thank you for your review!";
-    document.getElementById('reviewForm').reset();
-    selectedRating = 0;
-    document.querySelectorAll('#starRating span').forEach(s => s.style.color = '#ccc');
-
-  } catch (error) {
-    console.error("Error submitting review:", error);
-    msg.style.color = "red";
-    msg.textContent = "Error submitting review.";
   }
-});
+}
+
 
 function loadReviews(user) {
   const container = document.getElementById('reviewsContainer');
@@ -952,15 +951,61 @@ function deleteReview(docId) {
   showSection('gallerySection');
 }
 
-    function addToCartWithQty(name, _, imageUrl) {
+// Function to update price based on selected quantity
+function updateManualPrice(itemId, priceMap) {
+  const qty = document.getElementById(`qty-${itemId}`).value;
+  const price = priceMap[qty] || 0;
+  document.getElementById(`price-${itemId}`).textContent = price.toFixed(2);
+}
+
+// Function to add item to the cart with selected quantity
+function addToCartWithQty(name, _, imageUrl) {
   const itemId = name.replace(/\s+/g, '-');
   const qty = parseInt(document.getElementById(`qty-${itemId}`).value) || 1;
   const price = parseFloat(document.getElementById(`price-${itemId}`).textContent.replace(/,/g, ''));
-  const totalPrice = price; // Only for 1 day — gets updated later if multi-day
+  const totalPrice = price * qty; // Price for the selected quantity
 
   let cart = JSON.parse(localStorage.getItem('cart')) || [];
 
-  // 🔒 Prevent same item with same quantity
+  // Prevent adding the same item with the same quantity
+  const duplicate = cart.find(item => item.name === name && item.quantity === qty);
+  if (duplicate) {
+    alert("This item is already in the cart with the selected quantity.");
+    return;
+  }
+
+  // Add or update item in the cart
+  const existingItem = cart.find(item => item.name === name);
+  if (existingItem) {
+    existingItem.quantity = qty;
+    existingItem.price = price;
+    existingItem.totalPrice = totalPrice;
+  } else {
+    cart.push({ name, price, imageUrl, quantity: qty, totalPrice });
+  }
+
+  localStorage.setItem('cart', JSON.stringify(cart));
+  alert(`${name} added to cart.`);
+  updateCartCount();
+}
+
+// Function to update cart item count
+function updateCartCount() {
+  const cart = JSON.parse(localStorage.getItem('cart')) || [];
+  const count = cart.reduce((total, item) => total + item.quantity, 0);
+  document.getElementById('cart-count').textContent = count;
+}
+
+    // Add item to cart with selected quantity
+function addToCartWithQty(name, _, imageUrl) {
+  const itemId = name.replace(/\s+/g, '-');
+  const qty = parseInt(document.getElementById(`qty-${itemId}`).value) || 1;
+  const price = parseFloat(document.getElementById(`price-${itemId}`).textContent.replace(/,/g, ''));
+  const totalPrice = price * qty; // Total price for the selected quantity
+
+  let cart = JSON.parse(localStorage.getItem('cart')) || [];
+
+  // 🔒 Prevent same item with the same quantity
   const duplicate = cart.find(item => item.name === name && item.quantity === qty);
   if (duplicate) {
     showToast("MAXIMUM AMOUNT REACHED", "error");
@@ -974,7 +1019,7 @@ function deleteReview(docId) {
     existingItem.price = price;
     existingItem.totalPrice = totalPrice;
   } else {
-    cart.push({ name, price, imageUrl, quantity: qty, days: 1, totalPrice });
+    cart.push({ name, price, imageUrl, quantity: qty, totalPrice });
   }
 
   localStorage.setItem('cart', JSON.stringify(cart));
@@ -982,108 +1027,108 @@ function deleteReview(docId) {
   showToast("Added to cart", "success");
 }
 
-
-    function updateManualPrice(itemId, priceMap) {
+// Update price when quantity is selected
+function updateManualPrice(itemId, priceMap) {
   const qty = document.getElementById(`qty-${itemId}`).value;
   const price = priceMap[qty] || 0;
   document.getElementById(`price-${itemId}`).textContent = price.toFixed(2);
 }
 
-    function updatePrice(itemId, basePrice) {
+// Update price for multi-quantity items
+function updatePrice(itemId, basePrice) {
   const qty = parseInt(document.getElementById(`qty-${itemId}`).value) || 1;
   const total = qty * basePrice;
   document.getElementById(`price-${itemId}`).textContent = total.toFixed(2);
 }
 
-    // Load reviews
-    function loadReviews(user) {
-    const container = document.getElementById('reviewsContainer');
-container.innerHTML = ''; // Clear any existing reviews
+// Load reviews from Firestore and allow users to delete their own reviews
+function loadReviews(user) {
+  const container = document.getElementById('reviewsContainer');
+  container.innerHTML = ''; // Clear any existing reviews
 
-db.collection('reviews').orderBy('timestamp', 'desc').get().then(snapshot => {
-  if (snapshot.empty) {
-    container.innerHTML = '<p>No reviews yet.</p>';
+  db.collection('reviews').orderBy('timestamp', 'desc').get().then(snapshot => {
+    if (snapshot.empty) {
+      container.innerHTML = '<p>No reviews yet.</p>';
+      return;
+    }
+
+    snapshot.forEach(doc => {
+      const data = doc.data();
+      const canDelete = user && data.uid === user.uid; // Check if the logged-in user can delete the review
+
+      const reviewDiv = document.createElement('div');
+      reviewDiv.style.borderBottom = '1px solid #ddd';
+      reviewDiv.style.padding = '10px 0';
+
+      const stars = '★'.repeat(data.rating) + '☆'.repeat(5 - data.rating);
+
+      reviewDiv.innerHTML = `
+        <strong>${data.name}</strong> <span style="color: #f39c12;">${stars}</span><br/>
+        <p>${data.comment}</p>
+      `;
+
+      // Add delete button if the user can delete the review
+      if (canDelete) {
+        const delBtn = document.createElement('button');
+        delBtn.textContent = 'Delete';
+        delBtn.style.backgroundColor = '#e74c3c';
+        delBtn.style.color = 'white';
+        delBtn.style.border = 'none';
+        delBtn.style.padding = '5px 10px';
+        delBtn.style.borderRadius = '4px';
+        delBtn.style.cursor = 'pointer';
+        delBtn.onclick = () => deleteReview(doc.id); // Attach delete logic
+        reviewDiv.appendChild(delBtn); // Append the delete button
+      }
+
+      container.appendChild(reviewDiv);
+    });
+  }).catch(error => {
+    console.error('Error loading reviews:', error);
+    container.innerHTML = '<p>Error loading reviews.</p>';
+  });
+}
+
+// Delete review (without confirmation)
+function deleteReview(docId) {
+  const user = firebase.auth().currentUser;
+  if (!user) {
+    alert('You must be logged in to delete reviews.');
     return;
   }
 
-  snapshot.forEach(doc => {
-    const data = doc.data();
-    const user = firebase.auth().currentUser; // Ensure user is defined here if not passed as an argument
-    const canDelete = user && data.uid === user.uid;
-
-    const reviewDiv = document.createElement('div');
-    reviewDiv.style.borderBottom = '1px solid #ddd';
-    reviewDiv.style.padding = '10px 0';
-
-    const stars = '★'.repeat(data.rating) + '☆'.repeat(5 - data.rating);
-
-    reviewDiv.innerHTML = `
-      <strong>${data.name}</strong> <span style="color: #f39c12;">${stars}</span><br/>
-      <p>${data.comment}</p>
-    `;
-
-    if (canDelete) {
-      const delBtn = document.createElement('button');
-      delBtn.textContent = 'Delete';
-      delBtn.style.backgroundColor = '#e74c3c';
-      delBtn.style.color = 'white';
-      delBtn.style.border = 'none';
-      delBtn.style.padding = '5px 10px';
-      delBtn.style.borderRadius = '4px';
-      delBtn.style.cursor = 'pointer';
-      delBtn.onclick = () => deleteReview(doc.id); // Make sure deleteReview function exists
-      reviewDiv.appendChild(delBtn);
+  db.collection('reviews').doc(docId).get().then(doc => {
+    if (doc.exists && doc.data().uid === user.uid) {
+      db.collection('reviews').doc(docId).delete()
+        .then(() => {
+          alert('Review deleted.');
+          loadReviews(user); // Reload reviews after deletion
+        })
+        .catch(error => {
+          alert('Error deleting review: ' + error.message);
+        });
+    } else {
+      alert("You can only delete your own reviews.");
     }
-
-    container.appendChild(reviewDiv);
   });
-}).catch(error => {
-  console.error('Error loading reviews:', error);
-  container.innerHTML = '<p>Error loading reviews.</p>';
-});
+}
 
+// Show section (Switch active sections)
+function showSection(sectionId) {
+  document.querySelectorAll('.content-section').forEach(section => {
+    section.classList.remove('active');
+  });
+  document.getElementById(sectionId).classList.add('active');
+}
 
-    // Delete review
-    function deleteReview(docId) {
-      const user = firebase.auth().currentUser;
-      if (!user) {
-        alert('You must be logged in to delete reviews.');
-        return;
-      }
+// Logout user
+function logoutUser() {
+  firebase.auth().signOut().then(() => {
+    window.location.href = 'login.html';
+  });
+}
 
-      db.collection('reviews').doc(docId).get().then(doc => {
-        if (doc.exists && doc.data().uid === user.uid) {
-          db.collection('reviews').doc(docId).delete()
-            .then(() => {
-              alert('Review deleted.');
-              loadReviews(user);
-            })
-            .catch(error => {
-              alert('Error deleting review: ' + error.message);
-            });
-        } else {
-          alert("You can only delete your own reviews.");
-        }
-      });
-    }
-
-    // Show section
-    function showSection(sectionId) {
-      document.querySelectorAll('.content-section').forEach(section => {
-        section.classList.remove('active');
-      });
-      document.getElementById(sectionId).classList.add('active');
-    }
-
-    // Logout
-    function logoutUser() {
-      firebase.auth().signOut().then(() => {
-        window.location.href = 'login.html';
-      });
-    }
-
-    // CART FUNCTIONALITY
-
+// Add item to the cart
 function addToCart(name, price, imageUrl) {
   let cart = JSON.parse(localStorage.getItem('cart')) || [];
   const existingItem = cart.find(item => item.name === name);
@@ -1097,13 +1142,15 @@ function addToCart(name, price, imageUrl) {
   alert(`${name} added to cart.`);
 }
 
+// Update cart item count
 function updateCartCount() {
   let cart = JSON.parse(localStorage.getItem('cart')) || [];
   const count = cart.reduce((total, item) => total + item.quantity, 0);
   document.getElementById('cart-count').textContent = count;
 }
 
-    function updateRentalDuration() {
+// Update rental duration and prices
+function updateRentalDuration() {
   const startDateInput = document.getElementById('rentalStartDate');
   const endDateInput = document.getElementById('rentalEndDate');
 
@@ -1124,11 +1171,10 @@ function updateCartCount() {
   cart.forEach(item => {
     item.days = days;
     item.totalPrice = item.price * days; // Don't multiply by quantity again
-    item.days = days;
   });
 
   localStorage.setItem('cart', JSON.stringify(cart));
-  viewCart(); // update UI
+  viewCart(); // Update UI
 }
 
 function viewCart() {
