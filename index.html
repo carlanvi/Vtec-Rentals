@@ -1074,43 +1074,41 @@ document.getElementById('closeCartBtn').addEventListener('click', () => {
 });
 
 // Checkout click
-document.getElementById('checkoutBtn').addEventListener('click', async () => {
-  const nameField = document.getElementById("customerName");
-  const phoneField = document.getElementById("customerPhone");
-  const locationField = document.getElementById("customerLocation");
-  const dateField = document.getElementById("startDate");
-  const startTimeField = document.getElementById("startTime");
-  const endTimeField = document.getElementById("endTime");
+document.getElementById('checkoutBtn').addEventListener('click', () => {
+  const fields = [
+    document.getElementById("customerName"),
+    document.getElementById("customerPhone"),
+    document.getElementById("customerLocation"),
+    document.getElementById("startDate"),
+    document.getElementById("startTime"),
+    document.getElementById("endTime")
+  ];
 
-  let valid = true;
+  let firstError = null;
 
-  const requiredFields = [nameField, phoneField, locationField, dateField, startTimeField, endTimeField];
-
-  requiredFields.forEach(field => {
+  fields.forEach(field => {
     field.classList.remove("error");
     if (!field.value.trim()) {
       field.classList.add("error");
-      valid = false;
+      if (!firstError) firstError = field;
     }
   });
 
-  if (!valid) {
-    requiredFields.find(field => field.classList.contains("error")).focus();
+  if (firstError) {
+    firstError.focus();
     return;
   }
 
-  const name = nameField.value.trim();
-  const phone = phoneField.value.trim();
-  const location = locationField.value.trim();
-  const rentalDate = dateField.value;
-  const startTime = startTimeField.value;
-  const endTime = endTimeField.value;
+  const name = fields[0].value.trim();
+  const phone = fields[1].value.trim();
+  const location = fields[2].value.trim();
+  const date = fields[3].value.trim();
+  const startTime = fields[4].value.trim();
+  const endTime = fields[5].value.trim();
+
   const cart = JSON.parse(localStorage.getItem('cart')) || [];
 
-  // Optional: send this data to Firestore or server
-  // await db.collection("orders").add({ name, phone, location, rentalDate, startTime, endTime, cart });
-
-  alert(`Thank you, ${name}! Your booking for ${rentalDate} from ${startTime} to ${endTime} is confirmed.`);
+  alert(`Thanks ${name}! We’ve received your booking for ${date} from ${startTime} to ${endTime}.`);
 
   localStorage.removeItem('cart');
   updateCartCount();
