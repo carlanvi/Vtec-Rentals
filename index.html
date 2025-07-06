@@ -900,7 +900,7 @@ function viewCart() {
       quantityText.style.marginLeft = '10px';
 
       const priceSpan = document.createElement('span');
-      priceSpan.textContent = `$${(item.price * item.quantity).toFixed(2)}`;
+      priceSpan.textContent = `$${item.price.toFixed(2)}`;
       priceSpan.style.marginLeft = '10px';
       priceSpan.style.fontWeight = 'bold';
 
