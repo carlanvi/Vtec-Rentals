@@ -625,17 +625,7 @@
     let selectedRating = 0;
 
     // Star rating UI logic
-    document.querySelectorAll('#starRating span').forEach(star => {
-      star.addEventListener('click', () => {
-        selectedRating = parseInt(star.getAttribute('data-value'));
-        document.querySelectorAll('#starRating span').forEach(s => {
-          s.style.color = parseInt(s.getAttribute('data-value')) <= selectedRating ? '#f39c12' : '#ccc';
-        });
-      });
-    });
-
-    // Submit review
-document.getElementById('reviewForm').addEventListener('submit', async (e) => {
+    document.getElementById('reviewForm').addEventListener('submit', async (e) => {
   e.preventDefault();
 
   const user = firebase.auth().currentUser;
@@ -677,12 +667,12 @@ document.getElementById('reviewForm').addEventListener('submit', async (e) => {
       await docRef.update({ reviewed: true });
     }
 
-    // Success message and reset form
+    // Show success message
     msg.style.color = "green";
     msg.textContent = "Review Submitted!";
-    document.getElementById('reviewForm').reset();
-    selectedRating = 0;
-    document.querySelectorAll('#starRating span').forEach(s => s.style.color = '#ccc');
+    document.getElementById('reviewForm').reset(); // Reset form fields
+    selectedRating = 0; // Reset rating
+    document.querySelectorAll('#starRating span').forEach(s => s.style.color = '#ccc'); // Reset stars
 
     // Refresh reviews immediately after submission
     loadReviews();
