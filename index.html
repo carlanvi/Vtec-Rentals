@@ -267,33 +267,36 @@
       cursor: pointer;
       font-weight: bold;
     }
-
-    /* Cart Modal Styling */
+    
+/* Cart Modal Styling */
 #cartModal {
   position: fixed;
   top: 0;
   left: 0;
   width: 100vw;
   height: 100vh;
-  background: rgba(0,0,0,0.5);
+  background: rgba(0, 0, 0, 0.5);
   display: none;
   z-index: 2000;
 }
 
+/* Modal content area */
 #cartModal > div {
   background: white;
   max-width: 320px;
   margin: 80px auto;
   border-radius: 12px;
   padding: 15px 20px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
   font-family: 'Zilla Slab', serif;
   max-height: 70vh;
   display: flex;
-  flex-direction: column;  /* Stack content vertically */
-  padding-bottom: 80px;  /* Add padding to ensure buttons don't overlap */
+  flex-direction: column; /* Stack the content vertically */
+  padding-bottom: 80px; /* Add padding to ensure buttons don't overlap */
+  position: relative;
 }
 
+/* Title styling */
 #cartModal h2 {
   margin-top: 0;
   text-align: center;
@@ -302,8 +305,9 @@
 
 /* Cart items container (scrollable) */
 #cartItemsContainer {
-  overflow-y: auto;
-  flex-grow: 1; /* Take remaining space */
+  overflow-y: auto; /* Allow scrolling */
+  flex-grow: 1; /* Take the remaining space */
+  margin-bottom: 15px; /* Margin for spacing above buttons */
 }
 
 #cartItemsContainer > div {
@@ -345,6 +349,7 @@
   box-shadow: 0px -2px 5px rgba(0, 0, 0, 0.1);
 }
 
+/* Button styles */
 #cartButtons button {
   flex: 1;
   padding: 10px 0;
@@ -380,6 +385,7 @@
 #cartTotal {
   margin-top: 10px;
 }
+
 
     input.error {
   border: 2px solid red;
