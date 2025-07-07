@@ -1406,9 +1406,13 @@ document.getElementById('checkoutBtn').addEventListener('click', () => {
   const startTime = fields[4].value.trim();
   const endTime = fields[5].value.trim();
 
-  // Show the payment options modal
+  // **Hide the Cart Modal** after checkout button click
+  const cartModal = document.getElementById('cartModal');
+  cartModal.style.display = 'none';  // This closes the cart modal
+
+  // **Show the Payment Options Modal** after closing the cart modal
   const paymentOptionsModal = document.getElementById('paymentOptionsModal');
-  paymentOptionsModal.style.display = 'block';
+  paymentOptionsModal.style.display = 'block'; // Show the payment options modal
 
   // Handle Pay Full Price Option
   document.getElementById('payFullPrice').addEventListener('click', () => {
@@ -1426,17 +1430,11 @@ document.getElementById('checkoutBtn').addEventListener('click', () => {
     completeBooking();
   });
 
-  // Close the cart modal when the "Close" button is clicked
-  document.getElementById('closeCartBtn').addEventListener('click', () => {
-    document.getElementById('cartModal').style.display = 'none'; // Hide the cart modal
-  });
-
   // Function to finalize the booking and clear cart
   function completeBooking() {
     const cart = JSON.parse(localStorage.getItem('cart')) || [];
     localStorage.removeItem('cart');
     updateCartCount(); // Make sure to update cart count here
-    document.getElementById('cartModal').style.display = 'none'; // Hide the cart modal after booking is completed
   }
 
   // Function to send message to Telegram bot
