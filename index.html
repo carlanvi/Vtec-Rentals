@@ -451,7 +451,7 @@ textarea {
 
   <div id="reviewsContainer" style="max-width: 600px; margin: 0 auto; color: white;"></div>
 </div>
-
+  
 <!-- Cart Modal -->
 <div id="cartModal" style="display: none;"> <!-- Initially hidden -->
     <div>
@@ -549,23 +549,34 @@ textarea {
       // Show the Payment Options Modal
       const paymentOptionsModal = document.getElementById('paymentOptionsModal');
       paymentOptionsModal.style.display = 'block'; // Show the payment options modal
-    });
 
+      // Handle Payment Option
+      handlePaymentOption(name, phone, location, rentalDates, startTime, endTime);
+    });
+  });
+
+  // Function to handle Payment Option
+  function handlePaymentOption(name, phone, location, rentalDates, startTime, endTime) {
     // Handle Full Payment Option
     document.getElementById('payFullPrice').addEventListener('click', () => {
-      const paymentOptionsModal = document.getElementById('paymentOptionsModal');
-      paymentOptionsModal.style.display = 'none';
-      alert(`Thanks! Full payment will be processed online.`);
+      processPayment(name, phone, location, rentalDates, startTime, endTime, 'Full Price Online');
       handleStripePayment(); // Proceed to Stripe Payment
     });
 
     // Handle Deposit Payment Option
     document.getElementById('payDeposit').addEventListener('click', () => {
-      const paymentOptionsModal = document.getElementById('paymentOptionsModal');
-      paymentOptionsModal.style.display = 'none';
-      alert('Deposit received. The rest will be paid upon arrival.');
+      processPayment(name, phone, location, rentalDates, startTime, endTime, 'Deposit');
     });
-  });
+  }
+
+  // Function to process the payment and complete booking
+  function processPayment(name, phone, location, rentalDates, startTime, endTime, paymentType) {
+    const paymentOptionsModal = document.getElementById('paymentOptionsModal');
+    paymentOptionsModal.style.display = 'none';
+    alert(`Thanks ${name}! We’ve received your booking for ${rentalDates} from ${startTime} to ${endTime}. Payment: ${paymentType}.`);
+    sendTelegramMessage(name, phone, location, rentalDates, startTime, endTime, paymentType);
+    completeBooking();
+  }
 
   // Function to handle Stripe payment
   function handleStripePayment() {
@@ -588,6 +599,34 @@ textarea {
     .catch((error) => {
       console.error('Error creating checkout session:', error);
     });
+  }
+
+  // Function to finalize the booking and clear cart
+  function completeBooking() {
+    const cart = JSON.parse(localStorage.getItem('cart')) || [];
+    localStorage.removeItem('cart'); // Clear the cart from local storage
+    updateCartCount(); // Update cart count here (ensure this function exists)
+  }
+
+  // Function to send a message to Telegram bot
+  function sendTelegramMessage(name, phone, location, rentalDates, startTime, endTime, paymentType) {
+    const telegramBotToken = 'your_telegram_bot_token'; // Replace with your bot's token
+    const chatId = 'your_chat_id'; // Replace with your chat ID
+
+    const url = `https://api.telegram.org/bot${telegramBotToken}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(
+      `User: ${name} | Phone: ${phone} | Location: ${location} | Rental Dates: ${rentalDates} | Start: ${startTime} | End: ${endTime} | Payment: ${paymentType}`
+    )}`;
+
+    fetch(url)
+      .then(response => response.json())
+      .then(data => {
+        if (data.ok) {
+          console.log('Message sent successfully!');
+        } else {
+          console.error('Error sending message:', data);
+        }
+      })
+      .catch(error => console.error('Error:', error));
   }
 </script>
 
