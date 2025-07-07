@@ -870,20 +870,17 @@ window.onload = function() {
       const input = document.getElementById("rentalDateRange");
 
       if (selectedDates.length === 1) {
-        // Treat a single date as a 1-day rental
+        // 👇 User clicked just one date — treat it as 1-day range
         const onlyDate = selectedDates[0];
         const formatted = instance.formatDate(onlyDate, "Y-m-d");
-        input.value = `${formatted} to ${formatted}`;
+        input.value = `${formatted} to ${formatted}`; // force a 1-day range
         updateRentalDuration();
       } else if (selectedDates.length === 2) {
-        updateRentalDuration(); // ✅ Normal range
+        updateRentalDuration(); // normal behavior
       }
     }
   });
 };
-
-// ✅ Code below this point executes normally
-let selectedRating = 0;
 
 // Handle star rating UI
 document.querySelectorAll('#starRating span').forEach(star => {
