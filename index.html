@@ -1380,35 +1380,30 @@ function updateRentalDuration() {
   const end = new Date(endDateInput.value);
   const msPerDay = 1000 * 60 * 60 * 24;
 
-  // Adjust for start and end date properly by setting to midnight (00:00)
+  // Normalize times to midnight
   start.setHours(0, 0, 0, 0);
   end.setHours(0, 0, 0, 0);
 
-  // Calculate the difference in time
-  const diffInTime = end - start;
-  const days = Math.ceil(diffInTime / msPerDay) + 1; // Ensure both dates count
+  // ✅ Calculate inclusive number of days
+  const days = Math.round((end - start) / msPerDay) + 1;
 
-  // Check if it's at least 1 day
+  // Validate
   if (isNaN(days) || days < 1) {
-    alert("Minimum rental period is 1 full day.");
+    alert("Please select a valid rental date range.");
     return;
   }
 
-  console.log(`Rental Days: ${days}`);  // Check calculated days
+  console.log(`Rental Days: ${days}`); // Debug
 
-  // Retrieve current cart data
+  // Update cart items
   let cart = JSON.parse(localStorage.getItem('cart')) || [];
-
-  // Update each cart item based on the rental duration
   cart.forEach(item => {
-    item.days = days; 
-    item.totalPrice = item.price * days; // Update total price with days
+    item.days = days;
+    item.totalPrice = item.price * item.quantity * days; // ✅ price × quantity × days
   });
 
-  // Save updated cart back to localStorage
+  // Save and refresh
   localStorage.setItem('cart', JSON.stringify(cart));
-
-  // Update UI with new data
   viewCart();
 }
 
