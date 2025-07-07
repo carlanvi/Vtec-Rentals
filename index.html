@@ -1459,7 +1459,7 @@ function viewCart() {
   const modal = document.getElementById('cartModal');
   const container = document.getElementById('cartItemsContainer');
   const totalElem = document.getElementById('cartTotal');
-  container.innerHTML = ''; // Clear cart container
+  container.innerHTML = ''; // Clear the cart container
 
   let cart = JSON.parse(localStorage.getItem('cart')) || [];
   if (cart.length === 0) {
@@ -1469,10 +1469,9 @@ function viewCart() {
     let total = 0;
 
     cart.forEach((item, index) => {
-      // Make sure totalPrice is used
-      total += item.totalPrice || (item.price * item.quantity);
+      // Ensure totalPrice is used
+      total += item.totalPrice || (item.price * item.quantity); // Use totalPrice if available, else use price * quantity
 
-      // Creating cart item layout
       const itemDiv = document.createElement('div');
       itemDiv.style.display = 'flex';
       itemDiv.style.alignItems = 'center';
@@ -1530,7 +1529,6 @@ function viewCart() {
       container.appendChild(itemDiv);
     });
 
-    // Display the total amount
     totalElem.textContent = `Total: $${total.toLocaleString(undefined, { minimumFractionDigits: 2 })}`;
   }
 
