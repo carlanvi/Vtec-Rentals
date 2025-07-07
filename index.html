@@ -1426,12 +1426,17 @@ document.getElementById('checkoutBtn').addEventListener('click', () => {
     completeBooking();
   });
 
+  // Close the cart modal when the "Close" button is clicked
+  document.getElementById('closeCartBtn').addEventListener('click', () => {
+    document.getElementById('cartModal').style.display = 'none'; // Hide the cart modal
+  });
+
   // Function to finalize the booking and clear cart
   function completeBooking() {
     const cart = JSON.parse(localStorage.getItem('cart')) || [];
     localStorage.removeItem('cart');
     updateCartCount(); // Make sure to update cart count here
-    document.getElementById('cartModal').style.display = 'none';
+    document.getElementById('cartModal').style.display = 'none'; // Hide the cart modal after booking is completed
   }
 
   // Function to send message to Telegram bot
