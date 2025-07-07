@@ -1370,13 +1370,13 @@ function removeItem(index) {
   }
 }
 
-// Close cart modal
+// Checkout button click event
 document.getElementById('checkoutBtn').addEventListener('click', () => {
   const fields = [
     document.getElementById("customerName"),
     document.getElementById("customerPhone"),
     document.getElementById("customerLocation"),
-    document.getElementById("startDate"),
+    document.getElementById("rentalDateRange"), // Updated from 'startDate' to 'rentalDateRange'
     document.getElementById("startTime"),
     document.getElementById("endTime")
   ];
@@ -1392,7 +1392,7 @@ document.getElementById('checkoutBtn').addEventListener('click', () => {
     }
   });
 
-  // If there's an error, focus the first invalid field
+  // If there's an error, focus on the first invalid field
   if (firstError) {
     firstError.focus();
     return;
@@ -1402,7 +1402,7 @@ document.getElementById('checkoutBtn').addEventListener('click', () => {
   const name = fields[0].value.trim();
   const phone = fields[1].value.trim();
   const location = fields[2].value.trim();
-  const date = fields[3].value.trim();
+  const rentalDates = fields[3].value.trim();
   const startTime = fields[4].value.trim();
   const endTime = fields[5].value.trim();
 
@@ -1417,27 +1417,27 @@ document.getElementById('checkoutBtn').addEventListener('click', () => {
   // Handle Pay Full Price Option
   document.getElementById('payFullPrice').addEventListener('click', () => {
     paymentOptionsModal.style.display = 'none';
-    alert(`Thanks ${name}! We’ve received your booking for ${date} from ${startTime} to ${endTime}. Full payment will be processed online.`);
-    sendTelegramMessage(`User: ${name} | Phone: ${phone} | Location: ${location} | Dates: ${date} | Start: ${startTime} | End: ${endTime} | Payment: Full Price Online`);
+    alert(`Thanks ${name}! We’ve received your booking for ${rentalDates} from ${startTime} to ${endTime}. Full payment will be processed online.`);
+    sendTelegramMessage(`User: ${name} | Phone: ${phone} | Location: ${location} | Rental Dates: ${rentalDates} | Start: ${startTime} | End: ${endTime} | Payment: Full Price Online`);
     completeBooking();
   });
 
   // Handle Deposit Payment Option
   document.getElementById('payDeposit').addEventListener('click', () => {
     paymentOptionsModal.style.display = 'none';
-    alert(`Thanks ${name}! We’ve received your booking for ${date} from ${startTime} to ${endTime}. Deposit received. The rest will be paid upon arrival.`);
-    sendTelegramMessage(`User: ${name} | Phone: ${phone} | Location: ${location} | Dates: ${date} | Start: ${startTime} | End: ${endTime} | Payment: Deposit`);
+    alert(`Thanks ${name}! We’ve received your booking for ${rentalDates} from ${startTime} to ${endTime}. Deposit received. The rest will be paid upon arrival.`);
+    sendTelegramMessage(`User: ${name} | Phone: ${phone} | Location: ${location} | Rental Dates: ${rentalDates} | Start: ${startTime} | End: ${endTime} | Payment: Deposit`);
     completeBooking();
   });
 
   // Function to finalize the booking and clear cart
   function completeBooking() {
     const cart = JSON.parse(localStorage.getItem('cart')) || [];
-    localStorage.removeItem('cart');
-    updateCartCount(); // Make sure to update cart count here
+    localStorage.removeItem('cart'); // Clear the cart from local storage
+    updateCartCount(); // Update cart count here
   }
 
-  // Function to send message to Telegram bot
+  // Function to send a message to Telegram bot
   function sendTelegramMessage(message) {
     const telegramBotToken = 'your_telegram_bot_token'; // Replace with your bot's token
     const chatId = 'your_chat_id'; // Replace with your chat ID
