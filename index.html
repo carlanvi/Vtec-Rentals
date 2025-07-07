@@ -1547,34 +1547,6 @@ function removeItem(index) {
   }
 }
 
-  // Function to finalize the booking and clear cart
-  function completeBooking() {
-    const cart = JSON.parse(localStorage.getItem('cart')) || [];
-    localStorage.removeItem('cart'); // Clear the cart from local storage
-    updateCartCount(); // Update cart count here (ensure this function exists)
-  }
-
-  // Function to send a message to Telegram bot
-  function sendTelegramMessage(name, phone, location, rentalDates, startTime, endTime, paymentType) {
-    const telegramBotToken = 'your_telegram_bot_token'; // Replace with your bot's token
-    const chatId = 'your_chat_id'; // Replace with your chat ID
-
-    const url = `https://api.telegram.org/bot${telegramBotToken}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(
-      `User: ${name} | Phone: ${phone} | Location: ${location} | Rental Dates: ${rentalDates} | Start: ${startTime} | End: ${endTime} | Payment: ${paymentType}`
-    )}`;
-
-    fetch(url)
-      .then(response => response.json())
-      .then(data => {
-        if (data.ok) {
-          console.log('Message sent successfully!');
-        } else {
-          console.error('Error sending message:', data);
-        }
-      })
-      .catch(error => console.error('Error:', error));
-  }
-
     function showToast(message = "ADDED TO CART", type = "success") {
   const toast = document.getElementById('toast');
   toast.textContent = message;
