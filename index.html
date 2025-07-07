@@ -1370,39 +1370,34 @@ function updateCartCount() {
 
 // Update rental duration and prices
 function updateRentalDuration() {
-  const startDateInput = document.getElementById('rentalStartDate');
-  const endDateInput = document.getElementById('rentalEndDate');
+  const rangeInput = document.getElementById('rentalDateRange');
+  const dates = rangeInput.value.split(' to '); // Flatpickr returns a "start to end" format
 
-  // Ensure both start and end dates are selected
-  if (!startDateInput.value || !endDateInput.value) return;
+  if (dates.length !== 2) return;
 
-  const start = new Date(startDateInput.value);
-  const end = new Date(endDateInput.value);
+  const start = new Date(dates[0]);
+  const end = new Date(dates[1]);
   const msPerDay = 1000 * 60 * 60 * 24;
 
-  // Normalize times to midnight
   start.setHours(0, 0, 0, 0);
   end.setHours(0, 0, 0, 0);
 
-  // ✅ Calculate inclusive number of days
   const days = Math.round((end - start) / msPerDay) + 1;
 
-  // Validate
   if (isNaN(days) || days < 1) {
     alert("Please select a valid rental date range.");
     return;
   }
 
-  console.log(`Rental Days: ${days}`); // Debug
+  console.log(`Rental Days: ${days}`);
 
-  // Update cart items
   let cart = JSON.parse(localStorage.getItem('cart')) || [];
+
   cart.forEach(item => {
     item.days = days;
-    item.totalPrice = item.price * item.quantity * days; // ✅ price × quantity × days
+    item.totalPrice = item.price * item.quantity * days;
   });
 
-  // Save and refresh
   localStorage.setItem('cart', JSON.stringify(cart));
   viewCart();
 }
