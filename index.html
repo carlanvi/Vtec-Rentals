@@ -1419,49 +1419,47 @@ function updateRentalDuration() {
   // Ensure both start and end dates are selected
   if (!startDateInput.value || !endDateInput.value) return;
 
-  // Create date objects from the input values
   const start = new Date(startDateInput.value);
   const end = new Date(endDateInput.value);
-  
-  // Set both dates to midnight to avoid time zone issues
-  start.setHours(0, 0, 0, 0); // Set start date to midnight
-  end.setHours(0, 0, 0, 0);   // Set end date to midnight
-  
   const msPerDay = 1000 * 60 * 60 * 24;
 
-  // Calculate the difference in time between start and end dates
+  // Adjust for start and end date properly by setting to midnight (00:00)
+  start.setHours(0, 0, 0, 0);
+  end.setHours(0, 0, 0, 0);
+
+  // Calculate the difference in time
   const diffInTime = end - start;
+  const days = Math.ceil(diffInTime / msPerDay) + 1; // Ensure both dates count
 
-  // Calculate the number of days (adding 1 because we need to include the end date)
-  const days = Math.ceil(diffInTime / msPerDay) + 1;
-
-  // Ensure the rental period is at least 1 day
+  // Check if it's at least 1 day
   if (isNaN(days) || days < 1) {
     alert("Minimum rental period is 1 full day.");
     return;
   }
 
-  // Get the current cart from local storage
+  console.log(`Rental Days: ${days}`);  // Check calculated days
+
+  // Retrieve current cart data
   let cart = JSON.parse(localStorage.getItem('cart')) || [];
 
-  // Update each cart item's rental duration and total price
+  // Update each cart item based on the rental duration
   cart.forEach(item => {
-    item.days = days; // Update the rental days
-    item.totalPrice = item.price * days; // Calculate total price for the rental duration
+    item.days = days; 
+    item.totalPrice = item.price * days; // Update total price with days
   });
 
-  // Save the updated cart back to local storage
+  // Save updated cart back to localStorage
   localStorage.setItem('cart', JSON.stringify(cart));
 
-  // Update the UI to reflect the changes
-  viewCart(); // Update the cart UI with the new data
+  // Update UI with new data
+  viewCart();
 }
 
 function viewCart() {
   const modal = document.getElementById('cartModal');
   const container = document.getElementById('cartItemsContainer');
   const totalElem = document.getElementById('cartTotal');
-  container.innerHTML = ''; // Clear the cart container
+  container.innerHTML = ''; // Clear cart container
 
   let cart = JSON.parse(localStorage.getItem('cart')) || [];
   if (cart.length === 0) {
@@ -1471,10 +1469,10 @@ function viewCart() {
     let total = 0;
 
     cart.forEach((item, index) => {
-      // Add the item's total price to the overall total
-      total += item.totalPrice || item.price * item.quantity; // If totalPrice is set, use it, else fall back to price * quantity
+      // Make sure totalPrice is used
+      total += item.totalPrice || (item.price * item.quantity);
 
-      // Create the cart item display
+      // Creating cart item layout
       const itemDiv = document.createElement('div');
       itemDiv.style.display = 'flex';
       itemDiv.style.alignItems = 'center';
@@ -1482,7 +1480,6 @@ function viewCart() {
       itemDiv.style.padding = '8px 0';
       itemDiv.style.borderBottom = '1px solid #eee';
 
-      // Add image
       const img = document.createElement('img');
       img.src = item.imageUrl;
       img.alt = item.name;
@@ -1492,7 +1489,6 @@ function viewCart() {
       img.style.borderRadius = '6px';
       img.style.marginRight = '8px';
 
-      // Add item details (name, price, quantity)
       const infoDiv = document.createElement('div');
       infoDiv.style.flexGrow = '1';
       infoDiv.style.display = 'flex';
@@ -1534,12 +1530,11 @@ function viewCart() {
       container.appendChild(itemDiv);
     });
 
-    // Display total price
+    // Display the total amount
     totalElem.textContent = `Total: $${total.toLocaleString(undefined, { minimumFractionDigits: 2 })}`;
   }
 
-  // Show the cart modal
-  modal.style.display = 'block';
+  modal.style.display = 'block'; // Show the cart modal
 }
 
 function removeItem(index) {
