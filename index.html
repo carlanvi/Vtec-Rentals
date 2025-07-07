@@ -506,9 +506,8 @@ textarea {
       cartModal.style.display = 'none';  // Hide the cart modal
     });
 
-    // Checkout button event listener
+    // Checkout button click event
     document.getElementById('checkoutBtn').addEventListener('click', () => {
-      // Define fields for validation
       const fields = [
         document.getElementById("customerName"),
         document.getElementById("customerPhone"),
@@ -529,27 +528,42 @@ textarea {
         }
       });
 
-      // If there's an error, focus the first invalid field
+      // If there's an error, focus on the first invalid field
       if (firstError) {
         firstError.focus();
         return;
       }
 
+      // Get the values of the fields
+      const name = fields[0].value.trim();
+      const phone = fields[1].value.trim();
+      const location = fields[2].value.trim();
+      const rentalDates = fields[3].value.trim();
+      const startTime = fields[4].value.trim();
+      const endTime = fields[5].value.trim();
+
+      // Hide the Cart Modal after checkout button click
+      const cartModal = document.getElementById('cartModal');
+      cartModal.style.display = 'none';  // This closes the cart modal
+
       // Show the Payment Options Modal
       const paymentOptionsModal = document.getElementById('paymentOptionsModal');
-      paymentOptionsModal.style.display = 'block';
+      paymentOptionsModal.style.display = 'block'; // Show the payment options modal
+    });
 
-      // Handle Full Payment Option
-      document.getElementById('payFullPrice').addEventListener('click', () => {
-        paymentOptionsModal.style.display = 'none';
-        handleStripePayment(); // Proceed to Stripe Payment
-      });
+    // Handle Full Payment Option
+    document.getElementById('payFullPrice').addEventListener('click', () => {
+      const paymentOptionsModal = document.getElementById('paymentOptionsModal');
+      paymentOptionsModal.style.display = 'none';
+      alert(`Thanks! Full payment will be processed online.`);
+      handleStripePayment(); // Proceed to Stripe Payment
+    });
 
-      // Handle Deposit Payment Option
-      document.getElementById('payDeposit').addEventListener('click', () => {
-        paymentOptionsModal.style.display = 'none';
-        alert('You selected to make a deposit and pay the rest upon arrival.');
-      });
+    // Handle Deposit Payment Option
+    document.getElementById('payDeposit').addEventListener('click', () => {
+      const paymentOptionsModal = document.getElementById('paymentOptionsModal');
+      paymentOptionsModal.style.display = 'none';
+      alert('Deposit received. The rest will be paid upon arrival.');
     });
   });
 
@@ -559,20 +573,20 @@ textarea {
 
     // Create a checkout session on the server
     fetch('/create-checkout-session', {
-        method: 'POST',
+      method: 'POST',
     })
     .then(response => response.json())
     .then(sessionId => {
-        // Redirect to Stripe Checkout
-        stripe.redirectToCheckout({ sessionId: sessionId.sessionId })
-            .then(function (result) {
-                if (result.error) {
-                    alert(result.error.message);  // Handle any errors from Stripe
-                }
-            });
+      // Redirect to Stripe Checkout
+      stripe.redirectToCheckout({ sessionId: sessionId.sessionId })
+        .then(function (result) {
+          if (result.error) {
+            alert(result.error.message);  // Handle any errors from Stripe
+          }
+        });
     })
     .catch((error) => {
-        console.error('Error creating checkout session:', error);
+      console.error('Error creating checkout session:', error);
     });
   }
 </script>
@@ -1365,145 +1379,6 @@ function removeItem(index) {
     viewCart();
   }
 }
-
-<!-- Cart Modal -->
-<div id="cartModal" style="display: none;"> <!-- Initially hidden -->
-    <div>
-        <h2>Your Cart</h2>
-        <div style="margin-bottom: 10px;">
-            <label for="customerName"><strong>Your Name:</strong></label>
-            <input type="text" id="customerName" placeholder="Enter your name" style="width: 100%; padding: 10px;" required />
-        </div>
-        <div style="margin-bottom: 15px;">
-            <label for="customerPhone"><strong>Phone Number:</strong></label>
-            <input type="tel" id="customerPhone" placeholder="Enter phone number" style="width: 100%; padding: 10px;" required />
-        </div>
-        <div style="margin-bottom: 15px;">
-            <label for="rentalDateRange"><strong>Select Rental Dates:</strong></label>
-            <input id="rentalDateRange" placeholder="Select start and end date" style="width: 100%; padding: 10px;" />
-        </div>
-        <div style="display: flex; gap: 10px; margin-bottom: 10px;">
-            <div style="flex: 1;">
-                <label for="startTime">Start Time:</label>
-                <input type="time" id="startTime" style="width: 100%; padding: 10px;" />
-            </div>
-            <div style="flex: 1;">
-                <label for="endTime">End Time:</label>
-                <input type="time" id="endTime" style="width: 100%; padding: 10px;" />
-            </div>
-        </div>
-        <div style="margin-bottom: 15px;">
-            <label for="customerLocation"><strong>Location:</strong></label>
-            <input type="text" id="customerLocation" placeholder="Enter delivery location" style="width: 100%; padding: 10px;" required />
-        </div>
-        <div id="cartItemsContainer"></div>
-        <div id="cartTotal" style="text-align:right; font-weight:bold; margin-top: 10px;"></div>
-        <div id="cartButtons">
-            <button id="closeCartBtn">Close</button>
-            <button id="checkoutBtn">Checkout</button>
-        </div>
-    </div>
-</div>
-
-<!-- Payment Options Modal -->
-<div id="paymentOptionsModal" style="display: none;">
-    <h2>Select Payment Option</h2>
-    <button id="payFullPrice">Pay Full Price Online</button>
-    <button id="payDeposit">Make Deposit and Pay Rest Upon Arrival</button>
-</div>
-
-<script>
-  document.addEventListener('DOMContentLoaded', () => {
-    // Close Cart Modal
-    document.getElementById('closeCartBtn').addEventListener('click', () => {
-      const cartModal = document.getElementById('cartModal');
-      cartModal.style.display = 'none';  // Hide the cart modal
-    });
-
-    // Checkout button click event
-    document.getElementById('checkoutBtn').addEventListener('click', () => {
-      const fields = [
-        document.getElementById("customerName"),
-        document.getElementById("customerPhone"),
-        document.getElementById("customerLocation"),
-        document.getElementById("rentalDateRange"),
-        document.getElementById("startTime"),
-        document.getElementById("endTime")
-      ];
-
-      let firstError = null;
-
-      // Validate fields
-      fields.forEach(field => {
-        field.classList.remove("error");
-        if (!field.value.trim()) {
-          field.classList.add("error");
-          if (!firstError) firstError = field;
-        }
-      });
-
-      // If there's an error, focus on the first invalid field
-      if (firstError) {
-        firstError.focus();
-        return;
-      }
-
-      // Get the values of the fields
-      const name = fields[0].value.trim();
-      const phone = fields[1].value.trim();
-      const location = fields[2].value.trim();
-      const rentalDates = fields[3].value.trim();
-      const startTime = fields[4].value.trim();
-      const endTime = fields[5].value.trim();
-
-      // Hide the Cart Modal after checkout button click
-      const cartModal = document.getElementById('cartModal');
-      cartModal.style.display = 'none';  // This closes the cart modal
-
-      // Show the Payment Options Modal
-      const paymentOptionsModal = document.getElementById('paymentOptionsModal');
-      paymentOptionsModal.style.display = 'block'; // Show the payment options modal
-
-      // Handle Pay Full Price Option
-      document.getElementById('payFullPrice').addEventListener('click', () => {
-        paymentOptionsModal.style.display = 'none';
-        alert(`Thanks ${name}! We’ve received your booking for ${rentalDates} from ${startTime} to ${endTime}. Full payment will be processed online.`);
-        sendTelegramMessage(name, phone, location, rentalDates, startTime, endTime, 'Full Price Online');
-        completeBooking();
-      });
-
-      // Handle Deposit Payment Option
-      document.getElementById('payDeposit').addEventListener('click', () => {
-        paymentOptionsModal.style.display = 'none';
-        alert(`Thanks ${name}! We’ve received your booking for ${rentalDates} from ${startTime} to ${endTime}. Deposit received. The rest will be paid upon arrival.`);
-        sendTelegramMessage(name, phone, location, rentalDates, startTime, endTime, 'Deposit');
-        completeBooking();
-      });
-    });
-  });
-
-  // Function to handle Stripe payment
-  function handleStripePayment() {
-    const stripe = Stripe('your_stripe_publishable_key'); // Replace with your Stripe publishable key
-
-    // Create a checkout session on the server
-    fetch('/create-checkout-session', {
-      method: 'POST',
-    })
-    .then(response => response.json())
-    .then(sessionId => {
-      // Redirect to Stripe Checkout
-      stripe.redirectToCheckout({ sessionId: sessionId.sessionId })
-        .then(function (result) {
-          if (result.error) {
-            alert(result.error.message);  // Handle any errors from Stripe
-          }
-        });
-    })
-    .catch((error) => {
-      console.error('Error creating checkout session:', error);
-    });
-  }
 
   // Function to finalize the booking and clear cart
   function completeBooking() {
