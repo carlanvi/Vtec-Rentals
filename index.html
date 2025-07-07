@@ -292,6 +292,17 @@
       overflow-y: auto;
     }
 
+    input,
+textarea {
+  width: 100%;            /* Ensure input takes full width of the container */
+  padding: 10px;          /* Add padding for better user experience */
+  margin: 5px 0;          /* Space between input fields */
+  border-radius: 5px;     /* Rounded corners */
+  border: 1px solid #ccc; /* Light border */
+  box-sizing: border-box; /* Ensure padding and border are included in width */
+  font-size: 16px;        /* Font size for better readability */
+}
+
     #cartModal h2 {
       margin-top: 0;
       text-align: center;
