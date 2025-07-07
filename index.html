@@ -872,20 +872,6 @@ window.onload = function() {
     }
   }
 });
-
-        let cart = JSON.parse(localStorage.getItem('cart')) || [];
-
-        cart.forEach(item => {
-          item.days = days;
-          item.totalPrice = item.price * days;
-        });
-
-        localStorage.setItem('cart', JSON.stringify(cart));
-        viewCart();
-      }
-    }
-  });
-};
     
 let selectedRating = 0;
 
