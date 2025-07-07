@@ -863,16 +863,18 @@ window.onload = function() {
   updateCartCount();
 
   flatpickr("#rentalDateRange", {
-  mode: "range",
-  dateFormat: "Y-m-d",
-  minDate: "today",
-  onClose: function(selectedDates) {
-    if (selectedDates.length === 2) {
-      updateRentalDuration(); // ✅ Use centralized, correct logic
+    mode: "range",
+    dateFormat: "Y-m-d",
+    minDate: "today",
+    onClose: function(selectedDates) {
+      if (selectedDates.length === 2) {
+        updateRentalDuration(); // ✅ Central logic
+      }
     }
-  }
-});
-    
+  });
+}; // ✅ This closes the window.onload function
+
+// Your next code can now safely follow
 let selectedRating = 0;
 
 // Handle star rating UI
