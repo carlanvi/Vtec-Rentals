@@ -453,48 +453,59 @@ textarea {
 </div>
 
   <!-- Cart Modal -->
-  <div id="cartModal">
-    <div>
-      <h2>Your Cart</h2>
-      <div style="margin-bottom: 10px;">
-  <label for="customerName"><strong>Your Name:</strong></label>
-  <input type="text" id="customerName" placeholder="Enter your name" style="width: 100%; padding: 10px;" required />
-</div>
+<div id="cartModal">
+  <div>
+    <h2>Your Cart</h2>
+    <!-- Customer Information -->
+    <div style="margin-bottom: 10px;">
+      <label for="customerName"><strong>Your Name:</strong></label>
+      <input type="text" id="customerName" placeholder="Enter your name" style="width: 100%; padding: 10px;" required />
+    </div>
 
-<div style="margin-bottom: 15px;">
-  <label for="customerPhone"><strong>Phone Number:</strong></label>
-  <input type="tel" id="customerPhone" placeholder="Enter phone number" style="width: 100%; padding: 10px;" required />
-</div>
+    <div style="margin-bottom: 15px;">
+      <label for="customerPhone"><strong>Phone Number:</strong></label>
+      <input type="tel" id="customerPhone" placeholder="Enter phone number" style="width: 100%; padding: 10px;" required />
+    </div>
 
-      <div style="margin-bottom: 15px;">
-  <label for="rentalDateRange"><strong>Select Rental Dates:</strong></label>
-  <input id="rentalDateRange" placeholder="Select start and end date" style="width: 100%; padding: 10px;" />
-</div>
+    <div style="margin-bottom: 15px;">
+      <label for="rentalDateRange"><strong>Select Rental Dates:</strong></label>
+      <input id="rentalDateRange" placeholder="Select start and end date" style="width: 100%; padding: 10px;" />
+    </div>
 
-<div style="display: flex; gap: 10px; margin-bottom: 10px;">
-  <div style="flex: 1;">
-    <label for="startTime">Start Time:</label>
-    <input type="time" id="startTime" style="width: 100%; padding: 10px;" />
-  </div>
-  <div style="flex: 1;">
-    <label for="endTime">End Time:</label>
-    <input type="time" id="endTime" style="width: 100%; padding: 10px;" />
-  </div>
-</div>
-
-      <div style="margin-bottom: 15px;">
-  <label for="customerLocation"><strong>Location:</strong></label>
-  <input type="text" id="customerLocation" placeholder="Enter delivery location" style="width: 100%; padding: 10px;" required />
-</div>
-
-      <div id="cartItemsContainer"></div>
-      <div id="cartTotal" style="text-align:right; font-weight:bold; margin-top: 10px;"></div>
-      <div id="cartButtons">
-        <button id="closeCartBtn">Close</button>
-        <button id="checkoutBtn">Checkout</button>
+    <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+      <div style="flex: 1;">
+        <label for="startTime">Start Time:</label>
+        <input type="time" id="startTime" style="width: 100%; padding: 10px;" />
+      </div>
+      <div style="flex: 1;">
+        <label for="endTime">End Time:</label>
+        <input type="time" id="endTime" style="width: 100%; padding: 10px;" />
       </div>
     </div>
+
+    <div style="margin-bottom: 15px;">
+      <label for="customerLocation"><strong>Location:</strong></label>
+      <input type="text" id="customerLocation" placeholder="Enter delivery location" style="width: 100%; padding: 10px;" required />
+    </div>
+
+    <!-- Cart Items Section -->
+    <div id="cartItemsContainer"></div>
+    <div id="cartTotal" style="text-align:right; font-weight:bold; margin-top: 10px;"></div>
+
+    <!-- Checkout Button -->
+    <div id="cartButtons">
+      <button id="closeCartBtn">Close</button>
+      <button id="checkoutBtn">Checkout</button>
+    </div>
   </div>
+</div>
+
+<!-- Payment Options Modal (Hidden by default) -->
+<div id="paymentOptionsModal" style="display:none;">
+  <h2>Select Payment Option</h2>
+  <button id="payFullPrice">Pay Full Price Online</button>
+  <button id="payDeposit">Make Deposit and Pay Rest Upon Arrival</button>
+</div>
 
   <div id="toast" style="
   display: none;
@@ -1286,11 +1297,6 @@ function removeItem(index) {
 }
 
 // Close cart modal
-document.getElementById('closeCartBtn').addEventListener('click', () => {
-  document.getElementById('cartModal').style.display = 'none';
-});
-
-// Checkout click
 document.getElementById('checkoutBtn').addEventListener('click', () => {
   const fields = [
     document.getElementById("customerName"),
@@ -1303,6 +1309,7 @@ document.getElementById('checkoutBtn').addEventListener('click', () => {
 
   let firstError = null;
 
+  // Validate fields
   fields.forEach(field => {
     field.classList.remove("error");
     if (!field.value.trim()) {
@@ -1311,11 +1318,13 @@ document.getElementById('checkoutBtn').addEventListener('click', () => {
     }
   });
 
+  // If there's an error, focus the first invalid field
   if (firstError) {
     firstError.focus();
     return;
   }
 
+  // Get the values of the fields
   const name = fields[0].value.trim();
   const phone = fields[1].value.trim();
   const location = fields[2].value.trim();
@@ -1323,13 +1332,52 @@ document.getElementById('checkoutBtn').addEventListener('click', () => {
   const startTime = fields[4].value.trim();
   const endTime = fields[5].value.trim();
 
-  const cart = JSON.parse(localStorage.getItem('cart')) || [];
+  // Show the payment options modal
+  const paymentOptionsModal = document.getElementById('paymentOptionsModal');
+  paymentOptionsModal.style.display = 'block';
 
-  alert(`Thanks ${name}! We’ve received your booking for ${date} from ${startTime} to ${endTime}.`);
+  // Handle Pay Full Price Option
+  document.getElementById('payFullPrice').addEventListener('click', () => {
+    paymentOptionsModal.style.display = 'none';
+    alert(`Thanks ${name}! We’ve received your booking for ${date} from ${startTime} to ${endTime}. Full payment will be processed online.`);
+    sendTelegramMessage(`User: ${name} | Phone: ${phone} | Location: ${location} | Dates: ${date} | Start: ${startTime} | End: ${endTime} | Payment: Full Price Online`);
+    completeBooking();
+  });
 
-  localStorage.removeItem('cart');
-  updateCartCount();
-  document.getElementById('cartModal').style.display = 'none';
+  // Handle Deposit Payment Option
+  document.getElementById('payDeposit').addEventListener('click', () => {
+    paymentOptionsModal.style.display = 'none';
+    alert(`Thanks ${name}! We’ve received your booking for ${date} from ${startTime} to ${endTime}. Deposit received. The rest will be paid upon arrival.`);
+    sendTelegramMessage(`User: ${name} | Phone: ${phone} | Location: ${location} | Dates: ${date} | Start: ${startTime} | End: ${endTime} | Payment: Deposit`);
+    completeBooking();
+  });
+
+  // Function to finalize the booking and clear cart
+  function completeBooking() {
+    const cart = JSON.parse(localStorage.getItem('cart')) || [];
+    localStorage.removeItem('cart');
+    updateCartCount(); // Make sure to update cart count here
+    document.getElementById('cartModal').style.display = 'none';
+  }
+
+  // Function to send message to Telegram bot
+  function sendTelegramMessage(message) {
+    const telegramBotToken = 'your_telegram_bot_token'; // Replace with your bot's token
+    const chatId = 'your_chat_id'; // Replace with your chat ID
+
+    const url = `https://api.telegram.org/bot${telegramBotToken}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(message)}`;
+    
+    fetch(url)
+      .then(response => response.json())
+      .then(data => {
+        if (data.ok) {
+          console.log('Message sent successfully!');
+        } else {
+          console.error('Error sending message:', data);
+        }
+      })
+      .catch(error => console.error('Error:', error));
+  }
 });
 
     function showToast(message = "ADDED TO CART", type = "success") {
