@@ -269,98 +269,117 @@
     }
 
     /* Cart Modal Styling */
-    #cartModal {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      background: rgba(0,0,0,0.5);
-      display: none;
-      z-index: 2000;
-    }
+#cartModal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0,0,0,0.5);
+  display: none;
+  z-index: 2000;
+}
 
-    #cartModal > div {
-      background: white;
-      max-width: 320px;
-      margin: 80px auto;
-      border-radius: 12px;
-      padding: 15px 20px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-      font-family: 'Zilla Slab', serif;
-      max-height: 70vh;
-      overflow-y: auto;
-    }
+#cartModal > div {
+  background: white;
+  max-width: 320px;
+  margin: 80px auto;
+  border-radius: 12px;
+  padding: 15px 20px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  font-family: 'Zilla Slab', serif;
+  max-height: 70vh;
+  display: flex;
+  flex-direction: column;  /* Stack content vertically */
+  padding-bottom: 80px;  /* Add padding to ensure buttons don't overlap */
+}
 
-    #cartModal h2 {
-      margin-top: 0;
-      text-align: center;
-      color: #6200ea;
-    }
+#cartModal h2 {
+  margin-top: 0;
+  text-align: center;
+  color: #6200ea;
+}
 
-    #cartItemsContainer > div {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 8px 0;
-      border-bottom: 1px solid #eee;
-    }
+/* Cart items container (scrollable) */
+#cartItemsContainer {
+  overflow-y: auto;
+  flex-grow: 1; /* Take remaining space */
+}
 
-    #cartItemsContainer img {
-      width: 50px;
-      height: 50px;
-      object-fit: cover;
-      border-radius: 6px;
-      margin-right: 10px;
-    }
+#cartItemsContainer > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid #eee;
+}
 
-    #cartItemsContainer span {
-      font-weight: normal;
-    }
+#cartItemsContainer img {
+  width: 50px;
+  height: 50px;
+  object-fit: cover;
+  border-radius: 6px;
+  margin-right: 10px;
+}
 
-    #cartItemsContainer div > div {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-grow: 1;
-    }
+#cartItemsContainer span {
+  font-weight: normal;
+}
 
-    #cartButtons {
-      display: flex;
-      justify-content: space-between;
-      margin-top: 15px;
-    }
+#cartItemsContainer div > div {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-grow: 1;
+}
 
-    #cartButtons button {
-      flex: 1;
-      padding: 10px 0;
-      font-weight: bold;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      font-family: 'Zilla Slab', serif;
-      font-size: 16px;
-      margin: 0 5px;
-      transition: background-color 0.3s ease;
-    }
+/* Sticky buttons container at the bottom */
+#cartButtons {
+  position: sticky;
+  bottom: 0;
+  background: white;
+  padding: 10px 0;
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  box-shadow: 0px -2px 5px rgba(0, 0, 0, 0.1);
+}
 
-    #checkoutBtn {
-      background-color: #6200ea;
-      color: white;
-    }
+#cartButtons button {
+  flex: 1;
+  padding: 10px 0;
+  font-weight: bold;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-family: 'Zilla Slab', serif;
+  font-size: 16px;
+  margin: 0 5px;
+  transition: background-color 0.3s ease;
+}
 
-    #checkoutBtn:hover {
-      background-color: #3700b3;
-    }
+#checkoutBtn {
+  background-color: #6200ea;
+  color: white;
+}
 
-    #closeCartBtn {
-      background-color: #ccc;
-      color: black;
-    }
+#checkoutBtn:hover {
+  background-color: #3700b3;
+}
 
-    #closeCartBtn:hover {
-      background-color: #999;
-    }
+#closeCartBtn {
+  background-color: #ccc;
+  color: black;
+}
+
+#closeCartBtn:hover {
+  background-color: #999;
+}
+
+/* Optional: Add some margin to the cart total */
+#cartTotal {
+  margin-top: 10px;
+}
 
     input.error {
   border: 2px solid red;
