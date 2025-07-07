@@ -398,64 +398,127 @@ textarea {
   background-color: #fff4f4;
 }
 
-  /* Styling for Stripe Elements card input */
-  #card-element {
-    background-color: #fff;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    padding: 12px;
-    font-size: 16px;
-    width: 100%;
-    max-width: 400px;
-    box-sizing: border-box;
-    margin: 10px auto;
+/* Payment Modal Styling */
+#paymentModal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: #fff;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  width: 100%;
+  max-width: 500px;
+  text-align: center;
+  z-index: 9999;
+}
+
+/* Title Styling */
+#paymentModal h2 {
+  font-size: 22px;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+/* Card Input Styling */
+#card-element {
+  background-color: #f9f9f9;
+  border: 1px solid #ccc;
+  padding: 14px 16px;
+  border-radius: 8px;
+  font-size: 16px;
+  margin-top: 10px;
+  box-shadow: inset 0 1px 2px rgba(0,0,0,0.05);
+  transition: border-color 0.3s ease;
+}
+
+#card-element.StripeElement--focus {
+  border-color: #4CAF50; /* Green focus */
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Row Layout for Expiry and CVV */
+.form-row {
+  display: flex;
+  gap: 15px;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+
+/* Styling for input fields */
+.form-group {
+  margin-bottom: 15px;
+}
+
+.form-group label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 5px;
+  font-size: 14px;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 16px;
+  box-sizing: border-box;
+}
+
+/* Pay Now Button Styling */
+.payment-button {
+  padding: 12px 20px;
+  font-size: 16px;
+  cursor: pointer;
+  border: none;
+  background-color: #6200ea;
+  color: #fff;
+  border-radius: 8px;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  width: 100%;
+  max-width: 250px;
+  margin-top: 20px;
+}
+
+.payment-button:hover {
+  background-color: #4500b0;
+  transform: translateY(-3px);
+}
+
+/* Total display */
+.total-display {
+  margin: 20px 0;
+  font-weight: bold;
+  text-align: center;
+  font-size: 18px;
+}
+
+/* Error Messages */
+#card-errors {
+  color: red;
+  font-size: 14px;
+  margin-top: 10px;
+}
+
+/* Responsive Design for Small Screens */
+@media (max-width: 600px) {
+  #paymentModal {
+    padding: 20px;
   }
 
-  /* Improve focus effect */
-  #card-element:focus {
-    border-color: #4CAF50; /* Green border color on focus */
-    box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+  .form-row {
+    flex-direction: column;
+    gap: 10px;
   }
 
-  /* Pay Now button styling */
   .payment-button {
-    padding: 12px 20px;
-    font-size: 16px;
-    cursor: pointer;
-    border: none;
-    background-color: #7FBF7F;
-    color: #333;
-    border-radius: 5px;
-    transition: background-color 0.3s ease, transform 0.2s ease;
-    width: 100%;
-    max-width: 250px;
-    margin: 20px auto;
+    padding: 10px 15px;
+    font-size: 14px;
   }
-
-  .payment-button:hover {
-    background-color: #e3a300;
-    transform: translateY(-3px);
-  }
-
-  /* Container styling for better presentation */
-  #paymentOptionsModal {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background-color: white;
-    padding: 30px;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    text-align: center;
-    display: none;
-  }
-
-  #paymentOptionsModal h2 {
-    margin-bottom: 20px;
-    font-size: 22px;
-  }
-
+}
+    
   /* Toast Notification Styling */
   #toast {
     display: none;
