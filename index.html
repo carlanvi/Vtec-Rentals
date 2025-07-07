@@ -453,25 +453,21 @@ textarea {
 </div>
 
 <!-- Cart Modal -->
-<div id="cartModal">
+<div id="cartModal" style="display: none;"> <!-- Initially hidden -->
     <div>
         <h2>Your Cart</h2>
-        <!-- Customer Information -->
         <div style="margin-bottom: 10px;">
             <label for="customerName"><strong>Your Name:</strong></label>
             <input type="text" id="customerName" placeholder="Enter your name" style="width: 100%; padding: 10px;" required />
         </div>
-
         <div style="margin-bottom: 15px;">
             <label for="customerPhone"><strong>Phone Number:</strong></label>
             <input type="tel" id="customerPhone" placeholder="Enter phone number" style="width: 100%; padding: 10px;" required />
         </div>
-
         <div style="margin-bottom: 15px;">
             <label for="rentalDateRange"><strong>Select Rental Dates:</strong></label>
             <input id="rentalDateRange" placeholder="Select start and end date" style="width: 100%; padding: 10px;" />
         </div>
-
         <div style="display: flex; gap: 10px; margin-bottom: 10px;">
             <div style="flex: 1;">
                 <label for="startTime">Start Time:</label>
@@ -482,17 +478,12 @@ textarea {
                 <input type="time" id="endTime" style="width: 100%; padding: 10px;" />
             </div>
         </div>
-
         <div style="margin-bottom: 15px;">
             <label for="customerLocation"><strong>Location:</strong></label>
             <input type="text" id="customerLocation" placeholder="Enter delivery location" style="width: 100%; padding: 10px;" required />
         </div>
-
-        <!-- Cart Items Section -->
         <div id="cartItemsContainer"></div>
         <div id="cartTotal" style="text-align:right; font-weight:bold; margin-top: 10px;"></div>
-
-        <!-- Checkout Button -->
         <div id="cartButtons">
             <button id="closeCartBtn">Close</button>
             <button id="checkoutBtn">Checkout</button>
@@ -501,28 +492,20 @@ textarea {
 </div>
 
 <!-- Payment Options Modal -->
-<div id="paymentOptionsModal" style="display:none;">
+<div id="paymentOptionsModal" style="display: none;">
     <h2>Select Payment Option</h2>
     <button id="payFullPrice">Pay Full Price Online</button>
     <button id="payDeposit">Make Deposit and Pay Rest Upon Arrival</button>
 </div>
 
-<!-- Stripe Checkout Button (hidden initially) -->
-<div id="stripeCheckout" style="display:none;">
-    <button id="stripeCheckoutBtn">Pay Full Price Online</button>
-</div>
-
-<script src="https://js.stripe.com/v3/"></script> <!-- Include Stripe.js -->
 <script>
-    document.getElementById('checkoutBtn').addEventListener('click', () => {
-        const fields = [
-            document.getElementById("customerName"),
-            document.getElementById("customerPhone"),
-            document.getElementById("customerLocation"),
-            document.getElementById("rentalDateRange"),
-            document.getElementById("startTime"),
-            document.getElementById("endTime")
-        ];
+  window.onload = function() {
+    // Close Cart Modal
+    document.getElementById('closeCartBtn').addEventListener('click', () => {
+      const cartModal = document.getElementById('cartModal');
+      cartModal.style.display = 'none';  // Hide the cart modal
+    });
+  };
 
         let firstError = null;
 
