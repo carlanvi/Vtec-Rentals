@@ -863,18 +863,15 @@ window.onload = function() {
   updateCartCount();
 
   flatpickr("#rentalDateRange", {
-    mode: "range",
-    dateFormat: "Y-m-d",
-    minDate: "today",
-    onClose: function(selectedDates) {
-      if (selectedDates.length === 2) {
-        const [start, end] = selectedDates;
-        let days = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
-        days = Math.max(days, 1); // Ensure at least 1 day charge
-        if (days < 1) {
-          alert("Minimum rental is 1 day.");
-          return;
-        }
+  mode: "range",
+  dateFormat: "Y-m-d",
+  minDate: "today",
+  onClose: function(selectedDates) {
+    if (selectedDates.length === 2) {
+      updateRentalDuration(); // ✅ Use centralized, correct logic
+    }
+  }
+});
 
         let cart = JSON.parse(localStorage.getItem('cart')) || [];
 
