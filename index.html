@@ -539,12 +539,40 @@ textarea {
   <div id="reviewsContainer" style="max-width: 600px; margin: 0 auto; color: white;"></div>
 </div>
 
-<!-- Cart Modal -->
+  <!-- Cart Modal -->
 <div id="cartModal" style="display: none;"> <!-- Initially hidden -->
     <div>
         <h2>Your Cart</h2>
-        <!-- Add your form fields like Name, Phone, Location here -->
+        <div style="margin-bottom: 10px;">
+            <label for="customerName"><strong>Your Name:</strong></label>
+            <input type="text" id="customerName" placeholder="Enter your name" style="width: 100%; padding: 10px;" required />
+        </div>
+        <div style="margin-bottom: 15px;">
+            <label for="customerPhone"><strong>Phone Number:</strong></label>
+            <input type="tel" id="customerPhone" placeholder="Enter phone number" style="width: 100%; padding: 10px;" required />
+        </div>
+        <div style="margin-bottom: 15px;">
+            <label for="rentalDateRange"><strong>Select Rental Dates:</strong></label>
+            <input id="rentalDateRange" placeholder="Select start and end date" style="width: 100%; padding: 10px;" />
+        </div>
+        <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+            <div style="flex: 1;">
+                <label for="startTime">Start Time:</label>
+                <input type="time" id="startTime" style="width: 100%; padding: 10px;" />
+            </div>
+            <div style="flex: 1;">
+                <label for="endTime">End Time:</label>
+                <input type="time" id="endTime" style="width: 100%; padding: 10px;" />
+            </div>
+        </div>
+        <div style="margin-bottom: 15px;">
+            <label for="customerLocation"><strong>Location:</strong></label>
+            <input type="text" id="customerLocation" placeholder="Enter delivery location" style="width: 100%; padding: 10px;" required />
+        </div>
+        <div id="cartItemsContainer"></div>
+        <div id="cartTotal" style="text-align:right; font-weight:bold; margin-top: 10px;"></div>
         <div id="cartButtons">
+            <!-- Renamed 'Close' and 'Checkout' buttons with payment options -->
             <button id="payFullPrice" class="payment-button">Pay Full Price Online</button>
             <button id="payDeposit" class="payment-button">Pay Deposit (25%) and Rest Upon Arrival</button>
         </div>
@@ -554,12 +582,28 @@ textarea {
 <!-- Payment Options Modal (For Card Input) -->
 <div id="paymentOptionsModal" style="display: none;">
     <h2>Enter Your Card Details</h2>
+    <!-- The div where Stripe Elements will render the card input form -->
     <div id="card-element" style="margin-bottom: 20px;"></div>
     <button id="submitPayment" class="payment-button">Pay Now</button>
 </div>
 
-<script src="https://js.stripe.com/v3/"></script> <!-- Include Stripe.js -->
+<!-- Toast Notification for Cart Addition -->
+<div id="toast" style="
+  display: none;
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  background-color: #28a745;
+  color: white;
+  padding: 12px 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  z-index: 9999;
+  font-weight: bold;
+  transition: opacity 0.3s ease;
+">Added to cart</div>
 
+<script src="https://js.stripe.com/v3/"></script> <!-- Include Stripe.js -->
 <script>
   let stripe;
   let elements;
@@ -575,28 +619,6 @@ textarea {
     document.getElementById('payDeposit').addEventListener('click', () => {
       handlePayment('deposit');  // Trigger deposit payment (25%)
     });
-
-    // Initialize Stripe and Elements
-    stripe = Stripe('your_stripe_publishable_key'); // Replace with your Stripe publishable key
-    elements = stripe.elements();
-
-    // Create an instance of the card Element
-    card = elements.create('card', {
-      style: {
-        base: {
-          color: '#32325d',
-          fontFamily: '"Helvetica Neue", Helvetica, sans-serif',
-          fontSmoothing: 'antialiased',
-          fontSize: '16px',
-          '::placeholder': {
-            color: '#aab7c4',
-          },
-        },
-      },
-    });
-
-    // Mount the card input field to the DOM
-    card.mount('#card-element');
   });
 
   // Function to handle Full Payment or Deposit Payment
@@ -642,6 +664,26 @@ textarea {
     // Show Payment Options Modal for card details input
     const paymentOptionsModal = document.getElementById('paymentOptionsModal');
     paymentOptionsModal.style.display = 'block'; // Show the payment options modal
+
+    // Initialize Stripe and Elements
+    stripe = Stripe('your_stripe_publishable_key'); // Replace with your Stripe publishable key
+    elements = stripe.elements();
+
+    // Create an instance of the card Element
+    card = elements.create('card', {
+      style: {
+        base: {
+          color: '#32325d',
+          fontFamily: '"Helvetica Neue", Helvetica, sans-serif',
+          fontSmoothing: 'antialiased',
+          fontSize: '16px',
+          '::placeholder': {
+            color: '#aab7c4',
+          },
+        },
+      },
+    });
+    card.mount('#card-element'); // Mount the card input field
 
     // Calculate total (for simplicity, we assume cartTotal is a fixed value here)
     const cartTotal = 100; // Example total amount (this should come from your cart data)
@@ -712,6 +754,7 @@ textarea {
       })
       .catch(error => console.error('Error:', error));
   }
+
     
     let currentUser = null;
 
