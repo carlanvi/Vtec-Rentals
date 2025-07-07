@@ -1263,7 +1263,8 @@ function addToCartWithQty(name, _, imageUrl) {
   const itemId = name.replace(/\s+/g, '-');
   const qty = parseInt(document.getElementById(`qty-${itemId}`).value) || 1;
   const price = parseFloat(document.getElementById(`price-${itemId}`).textContent.replace(/,/g, ''));
-  const totalPrice = price * qty; // Total price for the selected quantity
+  const days = 1; // Default to 1 day until user selects date
+  const totalPrice = price * qty * days;
 
   let cart = JSON.parse(localStorage.getItem('cart')) || [];
 
@@ -1279,9 +1280,10 @@ function addToCartWithQty(name, _, imageUrl) {
   if (existingItem) {
     existingItem.quantity = qty;
     existingItem.price = price;
+    existingItem.days = days;
     existingItem.totalPrice = totalPrice;
   } else {
-    cart.push({ name, price, imageUrl, quantity: qty, totalPrice });
+    cart.push({ name, price, imageUrl, quantity: qty, totalPrice, days });
   }
 
   localStorage.setItem('cart', JSON.stringify(cart));
@@ -1470,8 +1472,9 @@ function viewCart() {
 
     cart.forEach((item, index) => {
       // Ensure totalPrice is used
-      total += item.totalPrice || (item.price * item.quantity); // Use totalPrice if available, else use price * quantity
-
+      const days = item.days || 1;
+total += (item.totalPrice || item.price * (item.quantity || 1) * days);
+      
       const itemDiv = document.createElement('div');
       itemDiv.style.display = 'flex';
       itemDiv.style.alignItems = 'center';
