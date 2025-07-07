@@ -1213,51 +1213,6 @@ function deleteReview(docId) {
   showSection('gallerySection');
 }
 
-// Function to update price based on selected quantity
-function updateManualPrice(itemId, priceMap) {
-  const qty = document.getElementById(`qty-${itemId}`).value;
-  const price = priceMap[qty] || 0;
-  document.getElementById(`price-${itemId}`).textContent = price.toFixed(2);
-}
-
-// Function to add item to the cart with selected quantity
-function addToCartWithQty(name, _, imageUrl) {
-  const itemId = name.replace(/\s+/g, '-');
-  const qty = parseInt(document.getElementById(`qty-${itemId}`).value) || 1;
-  const price = parseFloat(document.getElementById(`price-${itemId}`).textContent.replace(/,/g, ''));
-  const totalPrice = price * qty; // Price for the selected quantity
-
-  let cart = JSON.parse(localStorage.getItem('cart')) || [];
-
-  // Prevent adding the same item with the same quantity
-  const duplicate = cart.find(item => item.name === name && item.quantity === qty);
-  if (duplicate) {
-    alert("This item is already in the cart with the selected quantity.");
-    return;
-  }
-
-  // Add or update item in the cart
-  const existingItem = cart.find(item => item.name === name);
-  if (existingItem) {
-    existingItem.quantity = qty;
-    existingItem.price = price;
-    existingItem.totalPrice = totalPrice;
-  } else {
-    cart.push({ name, price, imageUrl, quantity: qty, totalPrice });
-  }
-
-  localStorage.setItem('cart', JSON.stringify(cart));
-  alert(`${name} added to cart.`);
-  updateCartCount();
-}
-
-// Function to update cart item count
-function updateCartCount() {
-  const cart = JSON.parse(localStorage.getItem('cart')) || [];
-  const count = cart.reduce((total, item) => total + item.quantity, 0);
-  document.getElementById('cart-count').textContent = count;
-}
-
     // Add item to cart with selected quantity
 function addToCartWithQty(name, _, imageUrl) {
   const itemId = name.replace(/\s+/g, '-');
