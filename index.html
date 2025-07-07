@@ -1471,66 +1471,69 @@ function viewCart() {
     let total = 0;
 
     cart.forEach((item, index) => {
-      // Ensure totalPrice is used
-      const days = item.days || 1;
-total += (item.totalPrice || item.price * (item.quantity || 1) * days);
-      
-      const itemDiv = document.createElement('div');
-      itemDiv.style.display = 'flex';
-      itemDiv.style.alignItems = 'center';
-      itemDiv.style.justifyContent = 'space-between';
-      itemDiv.style.padding = '8px 0';
-      itemDiv.style.borderBottom = '1px solid #eee';
+  const days = item.days || 1;
+  const quantity = item.quantity || 1;
+  const unitPrice = item.price || 0;
 
-      const img = document.createElement('img');
-      img.src = item.imageUrl;
-      img.alt = item.name;
-      img.style.width = '50px';
-      img.style.height = '50px';
-      img.style.objectFit = 'cover';
-      img.style.borderRadius = '6px';
-      img.style.marginRight = '8px';
+  const itemTotal = unitPrice * quantity * days;
+  total += itemTotal;
 
-      const infoDiv = document.createElement('div');
-      infoDiv.style.flexGrow = '1';
-      infoDiv.style.display = 'flex';
-      infoDiv.style.alignItems = 'center';
-      infoDiv.style.justifyContent = 'space-between';
+  const itemDiv = document.createElement('div');
+  itemDiv.style.display = 'flex';
+  itemDiv.style.alignItems = 'center';
+  itemDiv.style.justifyContent = 'space-between';
+  itemDiv.style.padding = '8px 0';
+  itemDiv.style.borderBottom = '1px solid #eee';
 
-      const nameSpan = document.createElement('span');
-      nameSpan.textContent = item.name;
+  const img = document.createElement('img');
+  img.src = item.imageUrl;
+  img.alt = item.name;
+  img.style.width = '50px';
+  img.style.height = '50px';
+  img.style.objectFit = 'cover';
+  img.style.borderRadius = '6px';
+  img.style.marginRight = '8px';
 
-      const quantityText = document.createElement('span');
-      quantityText.textContent = `Qty: ${item.quantity}`;
-      quantityText.style.marginLeft = '10px';
+  const infoDiv = document.createElement('div');
+  infoDiv.style.flexGrow = '1';
+  infoDiv.style.display = 'flex';
+  infoDiv.style.alignItems = 'center';
+  infoDiv.style.justifyContent = 'space-between';
 
-      const priceSpan = document.createElement('span');
-      priceSpan.textContent = `$${(item.totalPrice || item.price).toLocaleString(undefined, { minimumFractionDigits: 2 })} (${item.days || 1} day${item.days > 1 ? 's' : ''})`;
-      priceSpan.style.marginLeft = '10px';
-      priceSpan.style.fontWeight = 'bold';
+  const nameSpan = document.createElement('span');
+  nameSpan.textContent = item.name;
 
-      const controlsDiv = document.createElement('div');
-      controlsDiv.style.display = 'flex';
-      controlsDiv.style.alignItems = 'center';
+  const quantityText = document.createElement('span');
+  quantityText.textContent = `Qty: ${quantity}`;
+  quantityText.style.marginLeft = '10px';
 
-      const removeBtn = document.createElement('button');
-      removeBtn.textContent = '✖';
-      removeBtn.style.color = 'red';
-      removeBtn.style.marginLeft = '8px';
-      removeBtn.onclick = () => removeItem(index);
+  const priceSpan = document.createElement('span');
+  priceSpan.textContent = `$${itemTotal.toLocaleString(undefined, { minimumFractionDigits: 2 })} (${days} day${days > 1 ? 's' : ''})`;
+  priceSpan.style.marginLeft = '10px';
+  priceSpan.style.fontWeight = 'bold';
 
-      controlsDiv.appendChild(quantityText);
-      controlsDiv.appendChild(removeBtn);
+  const controlsDiv = document.createElement('div');
+  controlsDiv.style.display = 'flex';
+  controlsDiv.style.alignItems = 'center';
 
-      infoDiv.appendChild(nameSpan);
-      infoDiv.appendChild(priceSpan);
+  const removeBtn = document.createElement('button');
+  removeBtn.textContent = '✖';
+  removeBtn.style.color = 'red';
+  removeBtn.style.marginLeft = '8px';
+  removeBtn.onclick = () => removeItem(index);
 
-      itemDiv.appendChild(img);
-      itemDiv.appendChild(infoDiv);
-      itemDiv.appendChild(controlsDiv);
+  controlsDiv.appendChild(quantityText);
+  controlsDiv.appendChild(removeBtn);
 
-      container.appendChild(itemDiv);
-    });
+  infoDiv.appendChild(nameSpan);
+  infoDiv.appendChild(priceSpan);
+
+  itemDiv.appendChild(img);
+  itemDiv.appendChild(infoDiv);
+  itemDiv.appendChild(controlsDiv);
+
+  container.appendChild(itemDiv);
+});
 
     totalElem.textContent = `Total: $${total.toLocaleString(undefined, { minimumFractionDigits: 2 })}`;
   }
