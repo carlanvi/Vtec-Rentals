@@ -1424,8 +1424,11 @@ function updateRentalDuration() {
   const end = new Date(endDateInput.value);
   const msPerDay = 1000 * 60 * 60 * 24;
 
-  // Calculate the number of days, including both start and end dates
-  const days = Math.ceil((end - start) / msPerDay) + 1; // Adding 1 to include the end date
+  // Calculate the difference in time between start and end dates
+  const diffInTime = end - start;
+
+  // Calculate the number of days (adding 1 because we need to include the end date)
+  const days = Math.ceil(diffInTime / msPerDay) + 1; 
 
   // Ensure the rental period is at least 1 day
   if (isNaN(days) || days < 1) {
@@ -1438,7 +1441,7 @@ function updateRentalDuration() {
 
   // Update each cart item's rental duration and total price
   cart.forEach(item => {
-    item.days = days;
+    item.days = days; // Update the rental days
     item.totalPrice = item.price * days; // Calculate total price for the rental duration
   });
 
