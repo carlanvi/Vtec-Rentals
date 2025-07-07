@@ -1361,22 +1361,24 @@ function updateCartCount() {
 // Update rental duration and prices
 function updateRentalDuration() {
   const rangeInput = document.getElementById('rentalDateRange');
-  const dates = rangeInput.value.split(' to '); // Flatpickr returns a "start to end" format
+  const dates = rangeInput.value.split(' to ');
 
-  if (dates.length !== 2) return;
+  // If only one date is selected, treat it as a 1-day rental
+  if (dates.length === 1 && dates[0]) {
+    dates[1] = dates[0]; // Duplicate it as both start and end
+  }
+
+  if (dates.length !== 2 || !dates[0] || !dates[1]) return;
 
   const start = new Date(dates[0]);
   const end = new Date(dates[1]);
   const msPerDay = 1000 * 60 * 60 * 24;
 
-  // Normalize both dates to midnight
   start.setHours(0, 0, 0, 0);
   end.setHours(0, 0, 0, 0);
 
-  // ✅ Inclusive day count (e.g. July 9–9 = 1 day, July 9–10 = 2 days)
   const days = Math.round((end - start) / msPerDay) + 1;
 
-  // Validate
   if (isNaN(days) || days < 1) {
     alert("Please select a valid rental date range.");
     return;
@@ -1384,7 +1386,6 @@ function updateRentalDuration() {
 
   console.log(`Rental Days: ${days}`);
 
-  // Update cart items
   let cart = JSON.parse(localStorage.getItem('cart')) || [];
 
   cart.forEach(item => {
