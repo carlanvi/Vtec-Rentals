@@ -386,6 +386,42 @@ textarea {
   background-color: #fff4f4;
 }
 
+      /* Centering the Payment Options Modal */
+  #paymentOptionsModal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    display: none; /* Initially hidden */
+  }
+
+  /* Stack the payment buttons vertically */
+  #paymentButtons {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  #paymentButtons button {
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    border: none;
+    background-color: #f0c14b;
+    color: #333;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+  }
+
+  #paymentButtons button:hover {
+    background-color: #e3a300;
+  }
+
   </style>
 </head>
 
