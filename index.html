@@ -1217,28 +1217,28 @@ function deleteReview(docId) {
 function addToCartWithQty(name, _, imageUrl) {
   const itemId = name.replace(/\s+/g, '-');
   const qty = parseInt(document.getElementById(`qty-${itemId}`).value) || 1;
-  const price = parseFloat(document.getElementById(`price-${itemId}`).textContent.replace(/,/g, ''));
-  const days = 1; // Default to 1 day until user selects date
-  const totalPrice = price * qty * days;
+
+  const totalPriceDisplayed = parseFloat(document.getElementById(`price-${itemId}`).textContent.replace(/,/g, ''));
+  const unitPrice = totalPriceDisplayed / qty; // ✅ FIXED: Get price per unit
+  const days = 1;
+  const totalPrice = unitPrice * qty * days;
 
   let cart = JSON.parse(localStorage.getItem('cart')) || [];
 
-  // 🔒 Prevent same item with the same quantity
   const duplicate = cart.find(item => item.name === name && item.quantity === qty);
   if (duplicate) {
     showToast("MAXIMUM AMOUNT REACHED", "error");
     return;
   }
 
-  // 🛠 Update if same item but different quantity
   const existingItem = cart.find(item => item.name === name);
   if (existingItem) {
     existingItem.quantity = qty;
-    existingItem.price = price;
+    existingItem.price = unitPrice;
     existingItem.days = days;
     existingItem.totalPrice = totalPrice;
   } else {
-    cart.push({ name, price, imageUrl, quantity: qty, totalPrice, days });
+    cart.push({ name, price: unitPrice, imageUrl, quantity: qty, totalPrice, days });
   }
 
   localStorage.setItem('cart', JSON.stringify(cart));
