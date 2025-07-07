@@ -1413,6 +1413,7 @@ function updateCartCount() {
 
 // Update rental duration and prices
 function updateRentalDuration() {
+function updateRentalDuration() {
   const startDateInput = document.getElementById('rentalStartDate');
   const endDateInput = document.getElementById('rentalEndDate');
 
@@ -1422,13 +1423,18 @@ function updateRentalDuration() {
   // Create date objects from the input values
   const start = new Date(startDateInput.value);
   const end = new Date(endDateInput.value);
+  
+  // Set both dates to midnight to avoid time zone issues
+  start.setHours(0, 0, 0, 0); // Set start date to midnight
+  end.setHours(0, 0, 0, 0);   // Set end date to midnight
+  
   const msPerDay = 1000 * 60 * 60 * 24;
 
   // Calculate the difference in time between start and end dates
   const diffInTime = end - start;
 
   // Calculate the number of days (adding 1 because we need to include the end date)
-  const days = Math.ceil(diffInTime / msPerDay) + 1; 
+  const days = Math.ceil(diffInTime / msPerDay) + 1;
 
   // Ensure the rental period is at least 1 day
   if (isNaN(days) || days < 1) {
