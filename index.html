@@ -866,15 +866,23 @@ window.onload = function() {
     mode: "range",
     dateFormat: "Y-m-d",
     minDate: "today",
-    onClose: function(selectedDates) {
-      if (selectedDates.length === 2) {
-        updateRentalDuration(); // ✅ Central logic
+    onClose: function(selectedDates, dateStr, instance) {
+      const input = document.getElementById("rentalDateRange");
+
+      if (selectedDates.length === 1) {
+        // Treat a single date as a 1-day rental
+        const onlyDate = selectedDates[0];
+        const formatted = instance.formatDate(onlyDate, "Y-m-d");
+        input.value = `${formatted} to ${formatted}`;
+        updateRentalDuration();
+      } else if (selectedDates.length === 2) {
+        updateRentalDuration(); // ✅ Normal range
       }
     }
   });
-}; // ✅ This closes the window.onload function
+};
 
-// Your next code can now safely follow
+// ✅ Code below this point executes normally
 let selectedRating = 0;
 
 // Handle star rating UI
@@ -1364,11 +1372,14 @@ function updateRentalDuration() {
   const end = new Date(dates[1]);
   const msPerDay = 1000 * 60 * 60 * 24;
 
+  // Normalize both dates to midnight
   start.setHours(0, 0, 0, 0);
   end.setHours(0, 0, 0, 0);
 
+  // ✅ Inclusive day count (e.g. July 9–9 = 1 day, July 9–10 = 2 days)
   const days = Math.round((end - start) / msPerDay) + 1;
 
+  // Validate
   if (isNaN(days) || days < 1) {
     alert("Please select a valid rental date range.");
     return;
@@ -1376,6 +1387,7 @@ function updateRentalDuration() {
 
   console.log(`Rental Days: ${days}`);
 
+  // Update cart items
   let cart = JSON.parse(localStorage.getItem('cart')) || [];
 
   cart.forEach(item => {
