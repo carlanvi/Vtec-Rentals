@@ -386,7 +386,26 @@ textarea {
   background-color: #fff4f4;
 }
 
-  /* Styling the buttons to make them more aesthetic */
+  /* Styling for Stripe Elements card input */
+  #card-element {
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 12px;
+    font-size: 16px;
+    width: 100%;
+    max-width: 400px;
+    box-sizing: border-box;
+    margin: 10px auto;
+  }
+
+  /* Improve focus effect */
+  #card-element:focus {
+    border-color: #4CAF50; /* Green border color on focus */
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+  }
+
+  /* Pay Now button styling */
   .payment-button {
     padding: 12px 20px;
     font-size: 16px;
@@ -398,7 +417,7 @@ textarea {
     transition: background-color 0.3s ease, transform 0.2s ease;
     width: 100%;
     max-width: 250px;
-    margin: 10px auto;
+    margin: 20px auto;
   }
 
   .payment-button:hover {
@@ -406,7 +425,7 @@ textarea {
     transform: translateY(-3px);
   }
 
-  /* Payment Options Modal Styling */
+  /* Container styling for better presentation */
   #paymentOptionsModal {
     position: fixed;
     top: 50%;
@@ -435,7 +454,7 @@ textarea {
     color: white;
     padding: 12px 20px;
     border-radius: 8px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     z-index: 9999;
     font-weight: bold;
     transition: opacity 0.3s ease;
