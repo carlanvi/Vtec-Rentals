@@ -1453,7 +1453,7 @@ function viewCart() {
     let total = 0;
 
     cart.forEach((item, index) => {
-      total += item.totalPrice || (item.price * item.quantity);
+      total += item.totalPrice || item.price * item.quantity;
 
       const itemDiv = document.createElement('div');
       itemDiv.style.display = 'flex';
