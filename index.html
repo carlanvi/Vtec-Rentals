@@ -505,63 +505,76 @@ textarea {
       const cartModal = document.getElementById('cartModal');
       cartModal.style.display = 'none';  // Hide the cart modal
     });
+
+    // Checkout button event listener
+    document.getElementById('checkoutBtn').addEventListener('click', () => {
+      // Define fields for validation
+      const fields = [
+        document.getElementById("customerName"),
+        document.getElementById("customerPhone"),
+        document.getElementById("customerLocation"),
+        document.getElementById("rentalDateRange"),
+        document.getElementById("startTime"),
+        document.getElementById("endTime")
+      ];
+
+      let firstError = null;
+
+      // Validate fields
+      fields.forEach(field => {
+        field.classList.remove("error");
+        if (!field.value.trim()) {
+          field.classList.add("error");
+          if (!firstError) firstError = field;
+        }
+      });
+
+      // If there's an error, focus the first invalid field
+      if (firstError) {
+        firstError.focus();
+        return;
+      }
+
+      // Show the Payment Options Modal
+      const paymentOptionsModal = document.getElementById('paymentOptionsModal');
+      paymentOptionsModal.style.display = 'block';
+
+      // Handle Full Payment Option
+      document.getElementById('payFullPrice').addEventListener('click', () => {
+        paymentOptionsModal.style.display = 'none';
+        handleStripePayment(); // Proceed to Stripe Payment
+      });
+
+      // Handle Deposit Payment Option
+      document.getElementById('payDeposit').addEventListener('click', () => {
+        paymentOptionsModal.style.display = 'none';
+        alert('You selected to make a deposit and pay the rest upon arrival.');
+      });
+    });
   };
 
-        let firstError = null;
+  // Function to handle Stripe payment
+  function handleStripePayment() {
+    const stripe = Stripe('your_stripe_publishable_key'); // Replace with your Stripe publishable key
 
-        // Validate fields
-        fields.forEach(field => {
-            field.classList.remove("error");
-            if (!field.value.trim()) {
-                field.classList.add("error");
-                if (!firstError) firstError = field;
-            }
-        });
-
-        if (firstError) {
-            firstError.focus();
-            return;
-        }
-
-        // Show payment options modal
-        const paymentOptionsModal = document.getElementById('paymentOptionsModal');
-        paymentOptionsModal.style.display = 'block';
-
-        // Handle Full Payment Selection
-        document.getElementById('payFullPrice').addEventListener('click', () => {
-            paymentOptionsModal.style.display = 'none';
-            handleStripePayment(); // Proceed to Stripe Payment
-        });
-
-        // Handle Deposit Payment Selection
-        document.getElementById('payDeposit').addEventListener('click', () => {
-            paymentOptionsModal.style.display = 'none';
-            alert('You selected to make a deposit and pay the rest upon arrival.');
-        });
+    // Create a checkout session on the server
+    fetch('/create-checkout-session', {
+        method: 'POST',
+    })
+    .then(response => response.json())
+    .then(sessionId => {
+        // Redirect to Stripe Checkout
+        stripe.redirectToCheckout({ sessionId: sessionId.sessionId })
+            .then(function (result) {
+                if (result.error) {
+                    alert(result.error.message);  // Handle any errors from Stripe
+                }
+            });
+    })
+    .catch((error) => {
+        console.error('Error creating checkout session:', error);
     });
-
-    // Function to handle Stripe payment
-    function handleStripePayment() {
-        const stripe = Stripe('your_stripe_publishable_key'); // Replace with your Stripe publishable key
-
-        // Create a checkout session on the server
-        fetch('/create-checkout-session', {
-            method: 'POST',
-        })
-        .then(response => response.json())
-        .then(sessionId => {
-            // Redirect to Stripe Checkout
-            stripe.redirectToCheckout({ sessionId: sessionId.sessionId })
-                .then(function (result) {
-                    if (result.error) {
-                        alert(result.error.message);
-                    }
-                });
-        })
-        .catch((error) => {
-            console.error('Error creating checkout session:', error);
-        });
-    }
+  }
 </script>
 
   <div id="toast" style="
