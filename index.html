@@ -491,7 +491,9 @@ textarea {
   <p id="reviewSubmitMsg" style="text-align: center; color: #7fff7f; margin-top: 0;"></p>
 
   <div id="reviewsContainer" style="max-width: 600px; margin: 0 auto; color: white;"></div>
-</div><!-- Cart Modal -->
+</div>
+  
+  <!-- Cart Modal -->
 <div id="cartModal" style="display: none;"> <!-- Initially hidden -->
     <div>
         <h2>Your Cart</h2>
@@ -536,6 +538,109 @@ textarea {
     <h2>Enter Your Card Details</h2>
     <div id="stripeCheckoutContainer"></div>
 </div>
+
+<script src="https://js.stripe.com/v3/"></script> <!-- Include Stripe.js -->
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    // Pay Full Price button click event
+    document.getElementById('payFullPrice').addEventListener('click', () => {
+      handlePayment('full');  // Trigger full payment
+    });
+
+    // Pay Deposit button click event
+    document.getElementById('payDeposit').addEventListener('click', () => {
+      handlePayment('deposit');  // Trigger deposit payment (25%)
+    });
+  });
+
+  // Function to handle Full Payment or Deposit Payment
+  function handlePayment(paymentType) {
+    const fields = [
+      document.getElementById("customerName"),
+      document.getElementById("customerPhone"),
+      document.getElementById("customerLocation"),
+      document.getElementById("rentalDateRange"),
+      document.getElementById("startTime"),
+      document.getElementById("endTime")
+    ];
+
+    let firstError = null;
+
+    // Validate fields
+    fields.forEach(field => {
+      field.classList.remove("error");
+      if (!field.value.trim()) {
+        field.classList.add("error");
+        if (!firstError) firstError = field;
+      }
+    });
+
+    // If there's an error, focus on the first invalid field
+    if (firstError) {
+      firstError.focus();
+      return;
+    }
+
+<!-- Cart Modal -->
+<div id="cartModal" style="display: none;"> <!-- Initially hidden -->
+    <div>
+        <h2>Your Cart</h2>
+        <div style="margin-bottom: 10px;">
+            <label for="customerName"><strong>Your Name:</strong></label>
+            <input type="text" id="customerName" placeholder="Enter your name" style="width: 100%; padding: 10px;" required />
+        </div>
+        <div style="margin-bottom: 15px;">
+            <label for="customerPhone"><strong>Phone Number:</strong></label>
+            <input type="tel" id="customerPhone" placeholder="Enter phone number" style="width: 100%; padding: 10px;" required />
+        </div>
+        <div style="margin-bottom: 15px;">
+            <label for="rentalDateRange"><strong>Select Rental Dates:</strong></label>
+            <input id="rentalDateRange" placeholder="Select start and end date" style="width: 100%; padding: 10px;" />
+        </div>
+        <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+            <div style="flex: 1;">
+                <label for="startTime">Start Time:</label>
+                <input type="time" id="startTime" style="width: 100%; padding: 10px;" />
+            </div>
+            <div style="flex: 1;">
+                <label for="endTime">End Time:</label>
+                <input type="time" id="endTime" style="width: 100%; padding: 10px;" />
+            </div>
+        </div>
+        <div style="margin-bottom: 15px;">
+            <label for="customerLocation"><strong>Location:</strong></label>
+            <input type="text" id="customerLocation" placeholder="Enter delivery location" style="width: 100%; padding: 10px;" required />
+        </div>
+        <div id="cartItemsContainer"></div>
+        <div id="cartTotal" style="text-align:right; font-weight:bold; margin-top: 10px;"></div>
+        <div id="cartButtons">
+            <!-- Renamed 'Close' and 'Checkout' buttons with payment options -->
+            <button id="payFullPrice" class="payment-button">Pay Full Price Online</button>
+            <button id="payDeposit" class="payment-button">Pay Deposit (25%) and Rest Upon Arrival</button>
+        </div>
+    </div>
+</div>
+
+<!-- Payment Options Modal (For Card Input) -->
+<div id="paymentOptionsModal" style="display: none;">
+    <h2>Enter Your Card Details</h2>
+    <div id="stripeCheckoutContainer"></div>
+</div>
+<div id="toast" style="
+  display: none;
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  background-color: #28a745;
+  color: white;
+  padding: 12px 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  z-index: 9999;
+  font-weight: bold;
+  transition: opacity 0.3s ease;
+">Added to cart</div>
 
 <script src="https://js.stripe.com/v3/"></script> <!-- Include Stripe.js -->
 
@@ -656,22 +761,18 @@ textarea {
       .catch(error => console.error('Error:', error));
   }
 
-  <div id="toast" style="
-  display: none;
-  position: fixed;
-  bottom: 30px;
-  right: 30px;
-  background-color: #28a745;
-  color: white;
-  padding: 12px 20px;
-  border-radius: 8px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-  z-index: 9999;
-  font-weight: bold;
-  transition: opacity 0.3s ease;
-">Added to cart</div>
-  
-  <script>
+  // Function to show toast notification when an item is added to the cart
+  function showToast(message) {
+    const toast = document.getElementById('toast');
+    toast.innerHTML = message;
+    toast.style.display = 'block';
+    
+    // Hide the toast after 3 seconds
+    setTimeout(() => {
+      toast.style.display = 'none';
+    }, 3000);
+  }
+
     let currentUser = null;
 
     const firebaseConfig = {
