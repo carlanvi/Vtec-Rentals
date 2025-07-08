@@ -513,25 +513,26 @@ textarea {
   }
 
   .swal2-popup.swal2-rounded {
-    border-radius: 20px;
-    padding: 30px;
-  }
+  border-radius: 20px;
+  padding: 30px;
+  text-align: center; /* centers everything inside */
+}
 
-  .swal2-title-custom {
-    font-size: 28px;
-    font-family: 'Poppins', sans-serif;
-    font-weight: 700;
-    color: #2e7d32;
-  }
+.swal2-title-custom {
+  font-size: 28px;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 700;
+  color: #2e7d32;
+  text-align: center;
+}
 
-  .swal2-confirm-custom {
-    background-color: #1a73e8 !important;
-    color: white !important;
-    font-size: 16px;
-    border-radius: 8px !important;
-    padding: 10px 20px;
-  }
-
+.swal2-confirm-custom {
+  background-color: #1a73e8 !important;
+  color: white !important;
+  font-size: 16px;
+  border-radius: 8px !important;
+  padding: 10px 20px;
+}
   </style>
 </head>
 
@@ -900,9 +901,9 @@ function completeBooking() {
   Swal.fire({
   title: 'ORDER MADE',
   html: `
-    <div style="font-size: 18px; font-weight: 500; color: #333;">
+    <div style="font-size: 18px; font-weight: 500; color: #333; text-align: center;">
       WE WILL DELIVER THE ITEMS TO<br>
-      <span style="color: #1a73e8; font-weight: 600;">${location}</span><br>
+      <span style="color: #1a73e8; font-weight: 600;">${location}</span><br><br>
       ON <span style="color: #1a73e8; font-weight: 600;">${rentalDates}</span><br>
       AT <span style="color: #1a73e8; font-weight: 600;">${startTime}</span>
     </div>
