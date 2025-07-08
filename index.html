@@ -618,13 +618,27 @@ textarea {
     </div>
 </div>
 
-<!-- Payment Options Modal (For Card Input) -->
-<div id="paymentOptionsModal" style="display: none;">
-    <h2>Enter Your Card Details</h2>
-    <!-- The div where Stripe Elements will render the card input form -->
-    <div id="card-element" style="margin-bottom: 20px;"></div>
-    <button id="submitPayment" class="payment-button">Pay Now</button>
+<!-- Payment Modal Popup -->
+<div id="paymentOptionsModal" class="payment-modal">
+  <h2>Payment Information</h2>
+  <form id="stripePaymentForm" style="display: flex; flex-direction: column; gap: 18px;">
+    <input type="text" id="cardholderName" placeholder="Cardholder Name" required style="padding: 12px; border-radius: 8px; border:1px solid #ccc; font-size:16px;">
+    <div id="card-element" style="margin-bottom: 8px;"></div>
+    <div id="card-errors" role="alert" style="color:red; min-height:20px;"></div>
+    <button type="submit" class="payment-button" style="margin-top:10px;">Pay Now</button>
+    <button type="button" class="close-btn" id="closePaymentModal">Cancel</button>
+  </form>
 </div>
+<style>
+  .payment-modal { /* Already exists, ensure it is as shown in your CSS */ }
+  /* Optionally, add a dark semi-transparent background overlay for the modal */
+  #paymentModalOverlay {
+    display: none;
+    position: fixed; left: 0; top: 0; width: 100vw; height: 100vh;
+    background: rgba(0,0,0,0.4); z-index: 9998;
+  }
+</style>
+<div id="paymentModalOverlay"></div>
 
 <!-- Toast Notification for Cart Addition -->
 <div id="toast" style="
@@ -644,6 +658,48 @@ textarea {
 
 <script src="https://js.stripe.com/v3/"></script> <!-- Include Stripe.js -->
 <script>
+  document.addEventListener('DOMContentLoaded', function () {
+  // ... your other JS setup (event listeners, Stripe setup, etc.) ...
+
+  // Place THIS after your handlePayment and showPaymentModal functions, and after the modal/form exists:
+  document.getElementById('stripePaymentForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const name = document.getElementById('cardholderName').value.trim();
+    if (!name) {
+      document.getElementById('cardholderName').classList.add('error');
+      return;
+    } else {
+      document.getElementById('cardholderName').classList.remove('error');
+    }
+
+    // Create a PaymentIntent on your server
+    fetch('/create-payment-intent', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ paymentAmount: window._stripePaymentAmount })
+    })
+    .then(res => res.json())
+    .then(data => {
+      const clientSecret = data.clientSecret;
+      return stripe.confirmCardPayment(clientSecret, {
+        payment_method: {
+          card: card,
+          billing_details: { name }
+        }
+      });
+    })
+    .then(function(result) {
+      if (result.error) {
+        document.getElementById('card-errors').textContent = result.error.message;
+      } else if (result.paymentIntent.status === 'succeeded') {
+        hidePaymentModal();
+        alert('Payment successful!');
+        completeBooking();
+      }
+    });
+  });
+});
+  
   let stripe;
   let elements;
   let card;
@@ -748,24 +804,43 @@ textarea {
   }
 
   // Function to handle Stripe payment
-  function handleStripePayment(clientSecret) {
-    stripe.confirmCardPayment(clientSecret, {
-      payment_method: {
-        card: card,
+  function handlePayment(paymentType) {
+  // ... validation code ...
+
+  // Get values of the fields (same as before)
+  // ...
+
+  // Hide the Cart Modal after checkout button click
+  document.getElementById('cartModal').style.display = 'none';
+
+  // SHOW payment modal popup
+  showPaymentModal();
+
+  // Initialize Stripe Elements (only if not already initialized)
+  if (!stripe) stripe = Stripe('your_stripe_publishable_key'); // Replace with your Stripe key
+  if (!elements) elements = stripe.elements();
+
+  // Mount Card element only if not mounted
+  if (!card) {
+    card = elements.create('card', {
+      style: {
+        base: {
+          color: '#32325d',
+          fontFamily: '"Helvetica Neue", Helvetica, sans-serif',
+          fontSize: '16px',
+          '::placeholder': { color: '#aab7c4' },
+        },
       },
-    })
-    .then(function(result) {
-      if (result.error) {
-        alert(result.error.message);  // Handle any errors from Stripe
-      } else {
-        if (result.paymentIntent.status === 'succeeded') {
-          alert("Payment successful!");
-          completeBooking();
-        }
-      }
     });
+    card.mount('#card-element');
   }
 
+  // Save payment type and amount for use on form submit
+  window._stripePaymentType = paymentType;
+  // Use the actual cart total from your cart logic
+  window._stripeCartTotal = 100; // Replace with actual cart total
+  window._stripePaymentAmount = paymentType === 'full' ? window._stripeCartTotal : (window._stripeCartTotal * 0.25);
+  }
   // Function to finalize the booking and clear cart
   function completeBooking() {
     const cart = JSON.parse(localStorage.getItem('cart')) || [];
@@ -1553,17 +1628,20 @@ function removeItem(index) {
   // Show the modal when "Pay Now" is clicked
 function showPaymentModal() {
   document.getElementById('paymentOptionsModal').style.display = 'block';
-  document.getElementById('paymentOptionsModal').style.opacity = '1';
+  document.getElementById('paymentModalOverlay').style.display = 'block';
+  setTimeout(() => {
+    document.getElementById('paymentOptionsModal').style.opacity = 1;
+  }, 20);
 }
-
-// Close the modal when the user clicks the "Close" button or anywhere outside the modal
-document.getElementById('closePaymentModal').addEventListener('click', function() {
-  document.getElementById('paymentOptionsModal').style.display = 'none';
-  document.getElementById('paymentOptionsModal').style.opacity = '0';
-});
-
-// To show the payment modal on your page (triggered by clicking a button):
-document.getElementById('trigger-payment-modal').addEventListener('click', showPaymentModal);
+function hidePaymentModal() {
+  document.getElementById('paymentOptionsModal').style.opacity = 0;
+  setTimeout(() => {
+    document.getElementById('paymentOptionsModal').style.display = 'none';
+    document.getElementById('paymentModalOverlay').style.display = 'none';
+  }, 300);
+}
+document.getElementById('closePaymentModal').onclick = hidePaymentModal;
+document.getElementById('paymentModalOverlay').onclick = hidePaymentModal;
 
   </script>
   </body>
