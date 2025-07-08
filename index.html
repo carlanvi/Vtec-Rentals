@@ -7,7 +7,7 @@
   <title>VTEC RENTALS</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
   <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
   <!-- Firebase Scripts -->
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
@@ -841,7 +841,6 @@ function handlePayment(paymentType) {
   window._stripePaymentType = paymentType;
 }
 
-// Complete booking function
 function completeBooking() {
   // Get details from your form or page
   const name = document.getElementById("customerName")?.value || "N/A";
@@ -876,6 +875,14 @@ function completeBooking() {
   // Finish existing logic
   localStorage.removeItem('cart');
   updateCartCount && updateCartCount();
+
+  // ✅ Show SweetAlert confirmation popup (no end time)
+  Swal.fire({
+    title: 'ORDER MADE',
+    html: `WE WILL DELIVER THE ITEMS TO <strong>${location}</strong> ON <strong>${rentalDates}</strong> AT <strong>${startTime}</strong>.`,
+    icon: 'success',
+    confirmButtonText: 'OK'
+  });
 
   // Telegram notification function
   function sendTelegramMessage(name, phone, location, rentalDates, startTime, endTime, paymentType) {
