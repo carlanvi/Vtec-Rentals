@@ -679,6 +679,12 @@ function showPaymentModal() {
   overlay.style.display = 'block';
   setTimeout(() => { modal.style.opacity = 1; }, 20);
 
+  // --- FIX: Set the payment amount if missing ---
+  if (typeof window._stripePaymentAmount !== 'number') {
+    // Default to full total if not already set
+    window._stripePaymentAmount = getCartTotal();
+  }
+
   // Show the payment amount in the modal
   const amountDiv = document.getElementById('payment-amount');
   if (amountDiv && typeof window._stripePaymentAmount === 'number') {
