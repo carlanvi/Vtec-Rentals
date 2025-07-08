@@ -323,50 +323,49 @@
     }
 
     function loadReservations() {
-      const tableBody = document.getElementById('reservationsTable');
-      tableBody.innerHTML = '';
+  const tableBody = document.getElementById('reservationsTable');
+  tableBody.innerHTML = '';
 
-      db.collection('bookings').orderBy('date').onSnapshot((querySnapshot) => {
-        tableBody.innerHTML = '';
+  db.collection('reservations').orderBy('createdAt', 'desc').onSnapshot((querySnapshot) => {
+    tableBody.innerHTML = '';
+    querySnapshot.forEach((doc) => {
+      const booking = doc.data();
 
-        querySnapshot.forEach((doc) => {
-          const booking = doc.data();
-
-          tableBody.innerHTML += `
-            <tr>
-              <td>${booking.name}</td>
-              <td>${booking.phone}</td>
-              <td>${booking.date}</td>
-              <td>${booking.time}</td>
-              <td>${booking.service}</td>
-            </tr>
-          `;
-        });
-      });
+      tableBody.innerHTML += `
+        <tr>
+          <td>${booking.name}</td>
+          <td>${booking.phone}</td>
+          <td>${booking.rentalDates || ''}</td>
+          <td>${booking.startTime || ''} - ${booking.endTime || ''}</td>
+          <td>${booking.paymentType || ''}</td>
+        </tr>
+      `;
+    });
+  });
     }
 
     function clearReservations() {
-      const confirmInput = document.getElementById('clearInput').value.trim();
+  const confirmInput = document.getElementById('clearInput').value.trim();
 
-      if (confirmInput !== 'CONFIRM') {
-        alert('TYPE "CONFIRM" TO CLEAR ALL RESERVATIONS.');
-        return;
-      }
+  if (confirmInput !== 'CONFIRM') {
+    alert('TYPE "CONFIRM" TO CLEAR ALL RESERVATIONS.');
+    return;
+  }
 
-      db.collection('bookings').get().then((querySnapshot) => {
-        const batch = db.batch();
+  db.collection('reservations').get().then((querySnapshot) => {
+    const batch = db.batch();
 
-        querySnapshot.forEach((doc) => {
-          batch.delete(doc.ref);
-        });
+    querySnapshot.forEach((doc) => {
+      batch.delete(doc.ref);
+    });
 
-        batch.commit().then(() => {
-          alert('All reservations cleared successfully.');
-          document.getElementById('clearInput').value = '';
-        });
-      });
+    batch.commit().then(() => {
+      alert('All reservations cleared successfully.');
+      document.getElementById('clearInput').value = '';
+    });
+  });
     }
-
+    
     function addUnavailableDate() {
       const dateInput = document.getElementById('unavailableDateInput').value;
       const isAllDay = document.getElementById('allDayCheckbox').checked;
