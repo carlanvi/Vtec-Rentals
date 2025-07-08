@@ -743,11 +743,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // Payment option buttons
   document.getElementById('payFullPrice').addEventListener('click', () => {
-    handlePayment('full');
-  });
-  document.getElementById('payDeposit').addEventListener('click', () => {
-    handlePayment('deposit');
-  });
+  handlePayment('full');
+});
+document.getElementById('payDeposit').addEventListener('click', () => {
+  handlePayment('deposit');
+});
 
   // Stripe form submission
   document.getElementById('stripePaymentForm').addEventListener('submit', function(e) {
