@@ -398,8 +398,8 @@ textarea {
   background-color: #fff4f4;
 }
 
-/* Payment Modal Styling */
-#paymentModal {
+/* Payment Modal Styling (Popup) */
+.payment-modal {
   position: fixed;
   top: 50%;
   left: 50%;
@@ -412,16 +412,35 @@ textarea {
   max-width: 500px;
   text-align: center;
   z-index: 9999;
+  display: none; /* Hidden by default */
+  opacity: 0;
+  transition: opacity 0.3s ease;
 }
 
 /* Title Styling */
-#paymentModal h2 {
+.payment-modal h2 {
   font-size: 22px;
   margin-bottom: 20px;
   color: #333;
 }
 
-/* Card Input Styling */
+/* Close Button Styling */
+.close-btn {
+  padding: 8px 16px;
+  font-size: 14px;
+  cursor: pointer;
+  border: none;
+  background-color: #bbb;
+  color: white;
+  border-radius: 8px;
+  margin-top: 20px;
+}
+
+.close-btn:hover {
+  background-color: #999;
+}
+
+/* Styling for the Stripe Elements card input */
 #card-element {
   background-color: #f9f9f9;
   border: 1px solid #ccc;
@@ -436,35 +455,6 @@ textarea {
 #card-element.StripeElement--focus {
   border-color: #4CAF50; /* Green focus */
   box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
-}
-
-/* Row Layout for Expiry and CVV */
-.form-row {
-  display: flex;
-  gap: 15px;
-  justify-content: space-between;
-  margin-top: 20px;
-}
-
-/* Styling for input fields */
-.form-group {
-  margin-bottom: 15px;
-}
-
-.form-group label {
-  display: block;
-  font-weight: 600;
-  margin-bottom: 5px;
-  font-size: 14px;
-}
-
-.form-group input {
-  width: 100%;
-  padding: 12px;
-  border-radius: 8px;
-  border: 1px solid #ccc;
-  font-size: 16px;
-  box-sizing: border-box;
 }
 
 /* Pay Now Button Styling */
@@ -487,30 +477,17 @@ textarea {
   transform: translateY(-3px);
 }
 
-/* Total display */
-.total-display {
-  margin: 20px 0;
-  font-weight: bold;
-  text-align: center;
-  font-size: 18px;
-}
-
-/* Error Messages */
+/* Error Message Styling */
 #card-errors {
   color: red;
   font-size: 14px;
   margin-top: 10px;
 }
 
-/* Responsive Design for Small Screens */
+/* Responsiveness for smaller screens */
 @media (max-width: 600px) {
-  #paymentModal {
+  .payment-modal {
     padding: 20px;
-  }
-
-  .form-row {
-    flex-direction: column;
-    gap: 10px;
   }
 
   .payment-button {
@@ -642,7 +619,7 @@ textarea {
 </div>
 
 <!-- Payment Options Modal (For Card Input) -->
-<div id="paymentOptionsModal" style="display: none;">
+<div id="paymentOptionsModal" class="payment-modal" style="display: none;">
   <h2>Enter Your Card Details</h2>
 
   <!-- Name on Card Input (optional) -->
@@ -654,10 +631,13 @@ textarea {
   <!-- The div where Stripe Elements will render the card input form -->
   <div id="card-element" class="form-group"></div> <!-- Stripe Card Input -->
 
-  <button id="submitPayment" class="payment-button">Pay Now</button>
+  <button type="submit" id="submitPayment" class="payment-button">Pay Now</button>
 
   <!-- Error Messages -->
   <div id="card-errors" role="alert" style="color: red; margin-top: 10px;"></div>
+
+  <!-- Close Button -->
+  <button id="closePaymentModal" class="close-btn">Close</button>
 </div>
 
 <!-- Toast Notification for Cart Addition -->
