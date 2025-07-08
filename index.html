@@ -690,6 +690,29 @@ textarea {
 ">Added to cart</div>
 
 <script>
+      let currentUser = null;
+
+    const firebaseConfig = {
+  apiKey: "AIzaSyACGG7Wf-TwdoeAxjqxQ8iIdpmPegEtunY",
+  authDomain: "vtec-rentals.firebaseapp.com",
+  projectId: "vtec-rentals",
+  storageBucket: "vtec-rentals.firebasestorage.app",
+  messagingSenderId: "278776721799",
+  appId: "1:278776721799:web:f70b283d8313cd84eca322"
+};
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    firebase.auth().onAuthStateChanged(user => {
+      if (!user) {
+        window.location.href = 'login.html';
+      } else {
+        currentUser = user;
+        loadReviews(currentUser);
+      }
+    });
+
 let stripe, elements, cardNumber, cardExpiry, cardCvc;
 
 // Helper functions for modal handling
@@ -947,29 +970,6 @@ function completeBooking() {
   }
 }
     
-    let currentUser = null;
-
-    const firebaseConfig = {
-  apiKey: "AIzaSyACGG7Wf-TwdoeAxjqxQ8iIdpmPegEtunY",
-  authDomain: "vtec-rentals.firebaseapp.com",
-  projectId: "vtec-rentals",
-  storageBucket: "vtec-rentals.firebasestorage.app",
-  messagingSenderId: "278776721799",
-  appId: "1:278776721799:web:f70b283d8313cd84eca322"
-};
-
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
-
-    firebase.auth().onAuthStateChanged(user => {
-      if (!user) {
-        window.location.href = 'login.html';
-      } else {
-        currentUser = user;
-        loadReviews(currentUser);
-      }
-    });
-
     function login() {
   const email = prompt('Enter admin email:');
   const password = prompt('Enter admin password:');
