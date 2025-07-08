@@ -679,10 +679,9 @@ function showPaymentModal() {
   overlay.style.display = 'block';
   setTimeout(() => { modal.style.opacity = 1; }, 20);
 
-  // --- FIX: Set the payment amount if missing ---
+  // Fix: Always set payment amount if missing
   if (typeof window._stripePaymentAmount !== 'number') {
-    // Default to full total if not already set
-    window._stripePaymentAmount = getCartTotal();
+    window._stripePaymentAmount = getCartTotal(); // fallback to full cart total
   }
 
   // Show the payment amount in the modal
@@ -692,7 +691,7 @@ function showPaymentModal() {
     amountDiv.textContent = "Amount to Pay: $" + dollars;
   }
 }
-
+  
 function hidePaymentModal() {
   const modal = document.getElementById('paymentOptionsModal');
   const overlay = document.getElementById('paymentModalOverlay');
