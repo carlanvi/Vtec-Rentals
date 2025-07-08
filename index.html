@@ -837,16 +837,26 @@ document.getElementById('payDeposit').addEventListener('click', () => {
   });
 });
 
-// Calculate cart total from your cart data
-function getCartTotal() {
-  // Example: replace with your real cart logic!
-  let cart = JSON.parse(localStorage.getItem('cart')) || [];
-  let total = 0;
-  cart.forEach(item => {
-    total += item.price * (item.quantity || 1);
-  });
-  return Math.round(total * 100); // Stripe expects amount in cents
-}
+  function getRentalDayCount() {
+    const rentalRange = document.getElementById('rentalDateRange').value;
+    if (!rentalRange) return 1;
+    const dates = rentalRange.split(' to ');
+    if (dates.length !== 2) return 1;
+    const start = new Date(dates[0]);
+    const end = new Date(dates[1]);
+    // count both start and end date, so add 1
+    return Math.ceil((end - start) / (1000 * 60 * 60 * 24)) + 1;
+  }
+
+  function getCartTotal() {
+    let cart = JSON.parse(localStorage.getItem('cart')) || [];
+    let total = 0;
+    cart.forEach(item => {
+      total += item.price * (item.quantity || 1);
+    });
+    const days = getRentalDayCount();
+    return Math.round(total * days * 100); // Stripe expects cents
+  }
 
 // Main payment handler
 function handlePayment(paymentType) {
