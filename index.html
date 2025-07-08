@@ -983,6 +983,25 @@ function completeBooking() {
     .catch(error => console.error('Error:', error));
   }
 }
+
+  function isBookingAvailable(newStart, newEnd, bookings) {
+  // 1 hour buffer in milliseconds
+  const buffer = 60 * 60 * 1000;
+
+  for (let booking of bookings) {
+    // Add 1hr buffer to the end of existing booking
+    const bookingEndWithBuffer = new Date(booking.end.getTime() + buffer);
+
+    // Check for overlap
+    if (
+      (newStart < bookingEndWithBuffer && newEnd > booking.start)
+    ) {
+      // Overlap detected
+      return false;
+    }
+  }
+  return true; // No overlap
+  }
     
     function login() {
   const email = prompt('Enter admin email:');
