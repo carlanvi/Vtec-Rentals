@@ -1622,24 +1622,6 @@ function removeItem(index) {
   }, 2500);
 }
 
-  // Show the modal when "Pay Now" is clicked
-function showPaymentModal() {
-  document.getElementById('paymentOptionsModal').style.display = 'block';
-  document.getElementById('paymentModalOverlay').style.display = 'block';
-  setTimeout(() => {
-    document.getElementById('paymentOptionsModal').style.opacity = 1;
-  }, 20);
-}
-function hidePaymentModal() {
-  document.getElementById('paymentOptionsModal').style.opacity = 0;
-  setTimeout(() => {
-    document.getElementById('paymentOptionsModal').style.display = 'none';
-    document.getElementById('paymentModalOverlay').style.display = 'none';
-  }, 300);
-}
-document.getElementById('closePaymentModal').onclick = hidePaymentModal;
-document.getElementById('paymentModalOverlay').onclick = hidePaymentModal;
-
   </script>
   </body>
 </html>
