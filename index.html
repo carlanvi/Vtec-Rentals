@@ -619,25 +619,11 @@ textarea {
 </div>
 
 <!-- Payment Options Modal (For Card Input) -->
-<div id="paymentOptionsModal" class="payment-modal" style="display: none;">
-  <h2>Enter Your Card Details</h2>
-
-  <!-- Name on Card Input (optional) -->
-  <div class="form-group">
-    <label for="cardholder-name">Name</label>
-    <input type="text" id="cardholder-name" placeholder="John Doe" required />
-  </div>
-
-  <!-- The div where Stripe Elements will render the card input form -->
-  <div id="card-element" class="form-group"></div> <!-- Stripe Card Input -->
-
-  <button type="submit" id="submitPayment" class="payment-button">Pay Now</button>
-
-  <!-- Error Messages -->
-  <div id="card-errors" role="alert" style="color: red; margin-top: 10px;"></div>
-
-  <!-- Close Button -->
-  <button id="closePaymentModal" class="close-btn">Close</button>
+<div id="paymentOptionsModal" style="display: none;">
+    <h2>Enter Your Card Details</h2>
+    <!-- The div where Stripe Elements will render the card input form -->
+    <div id="card-element" style="margin-bottom: 20px;"></div>
+    <button id="submitPayment" class="payment-button">Pay Now</button>
 </div>
 
 <!-- Toast Notification for Cart Addition -->
