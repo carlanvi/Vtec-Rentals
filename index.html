@@ -669,7 +669,7 @@ textarea {
 ">Added to cart</div>
 
 <script>
-let stripe, elements, card;
+let stripe, elements, cardNumber, cardExpiry, cardCvc;
 
 // Helper functions for modal handling
 function showPaymentModal() {
@@ -678,7 +678,15 @@ function showPaymentModal() {
   modal.style.display = 'block';
   overlay.style.display = 'block';
   setTimeout(() => { modal.style.opacity = 1; }, 20);
+
+  // Show the payment amount in the modal
+  const amountDiv = document.getElementById('payment-amount');
+  if (amountDiv && typeof window._stripePaymentAmount === 'number') {
+    let dollars = (window._stripePaymentAmount / 100).toFixed(2);
+    amountDiv.textContent = "Amount to Pay: $" + dollars;
+  }
 }
+
 function hidePaymentModal() {
   const modal = document.getElementById('paymentOptionsModal');
   const overlay = document.getElementById('paymentModalOverlay');
@@ -688,6 +696,7 @@ function hidePaymentModal() {
     overlay.style.display = 'none';
   }, 300);
 }
+
 document.addEventListener('DOMContentLoaded', function () {
   document.getElementById('closePaymentModal').onclick = hidePaymentModal;
   document.getElementById('paymentModalOverlay').onclick = hidePaymentModal;
@@ -695,7 +704,9 @@ document.addEventListener('DOMContentLoaded', function () {
   // Stripe initialization (only once)
   stripe = Stripe('your_stripe_publishable_key'); // <-- REPLACE with your real Stripe publishable key
   elements = stripe.elements();
-  card = elements.create('card', {
+
+  // Create split Stripe Elements
+  cardNumber = elements.create('cardNumber', {
     style: {
       base: {
         color: '#32325d',
@@ -705,7 +716,30 @@ document.addEventListener('DOMContentLoaded', function () {
       },
     },
   });
-  card.mount('#card-element');
+  cardExpiry = elements.create('cardExpiry', {
+    style: {
+      base: {
+        color: '#32325d',
+        fontFamily: '"Helvetica Neue", Helvetica, sans-serif',
+        fontSize: '16px',
+        '::placeholder': { color: '#aab7c4' },
+      },
+    },
+  });
+  cardCvc = elements.create('cardCvc', {
+    style: {
+      base: {
+        color: '#32325d',
+        fontFamily: '"Helvetica Neue", Helvetica, sans-serif',
+        fontSize: '16px',
+        '::placeholder': { color: '#aab7c4' },
+      },
+    },
+  });
+
+  cardNumber.mount('#card-number-element');
+  cardExpiry.mount('#card-expiry-element');
+  cardCvc.mount('#card-cvc-element');
 
   // Payment option buttons
   document.getElementById('payFullPrice').addEventListener('click', () => {
@@ -737,7 +771,7 @@ document.addEventListener('DOMContentLoaded', function () {
       const clientSecret = data.clientSecret;
       return stripe.confirmCardPayment(clientSecret, {
         payment_method: {
-          card: card,
+          card: cardNumber, // Use cardNumber element for confirmation
           billing_details: { name }
         }
       });
