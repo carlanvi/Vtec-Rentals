@@ -843,18 +843,17 @@ function handlePayment(paymentType) {
 
 // Complete booking function
 function completeBooking() {
-  // Get details from your form or page
-  const name = document.getElementById("customerName")?.value || "N/A";
-  const phone = document.getElementById("customerPhone")?.value || "N/A";
-  const location = document.getElementById("customerLocation")?.value || "N/A";
-  const rentalDates = document.getElementById("rentalDateRange")?.value || "N/A";
-  const startTime = document.getElementById("startTime")?.value || "N/A";
-  const endTime = document.getElementById("endTime")?.value || "N/A";
-  // Assume you have a variable or form field indicating payment type
-  const paymentType = window._stripePaymentType === "full" ? "Full Price" : "Deposit";
+// Get details from your form or page
+const name = document.getElementById("customerName")?.value || "N/A";
+const phone = document.getElementById("customerPhone")?.value || "N/A";
+const location = document.getElementById("customerLocation")?.value || "N/A";
+const rentalDates = document.getElementById("rentalDateRange")?.value || "N/A";
+const startTime = document.getElementById("startTime")?.value || "N/A";
+const endTime = document.getElementById("endTime")?.value || "N/A";
+const paymentType = window._stripePaymentType === "full" ? "Full Price" : "Deposit";
 
-  // Format the message
-  const message = `New Order!
+// Format the message for Telegram
+const message = `New Order!
 Name: ${name}
 Phone: ${phone}
 Location: ${location}
@@ -863,15 +862,32 @@ Start Time: ${startTime}
 End Time: ${endTime}
 Payment: ${paymentType}`;
 
-  // Send to Telegram
-  sendTelegramMessage(message);
+// Send to Telegram
+sendTelegramMessage(name, phone, location, rentalDates, startTime, endTime, paymentType);
 
-  // Finish existing logic
-  localStorage.removeItem('cart');
-  updateCartCount && updateCartCount();
-}
+// ALSO: Send to Firestore for Admin Dashboard
+db.collection("reservations").add({
+  name: name,
+  phone: phone,
+  location: location,
+  rentalDates: rentalDates,
+  startTime: startTime,
+  endTime: endTime,
+  paymentType: paymentType,
+  createdAt: firebase.firestore.FieldValue.serverTimestamp()
+})
+.then(() => {
+  console.log("Reservation added to Firestore!");
+})
+.catch((error) => {
+  console.error("Error adding reservation: ", error);
+});
 
-// Telegram notification function (optional)
+// Finish existing logic
+localStorage.removeItem('cart');
+updateCartCount && updateCartCount();
+
+// Telegram notification function
 function sendTelegramMessage(name, phone, location, rentalDates, startTime, endTime, paymentType) {
   const telegramBotToken = 'your_telegram_bot_token'; // Replace!
   const chatId = 'your_chat_id'; // Replace!
@@ -895,7 +911,7 @@ function sendTelegramMessage(name, phone, location, rentalDates, startTime, endT
       }
     })
     .catch(error => console.error('Error:', error));
-}
+  }
     
     let currentUser = null;
 
