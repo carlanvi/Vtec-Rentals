@@ -843,19 +843,49 @@ function handlePayment(paymentType) {
 
 // Complete booking function
 function completeBooking() {
+  // Get details from your form or page
+  const name = document.getElementById("customerName")?.value || "N/A";
+  const phone = document.getElementById("customerPhone")?.value || "N/A";
+  const location = document.getElementById("customerLocation")?.value || "N/A";
+  const rentalDates = document.getElementById("rentalDateRange")?.value || "N/A";
+  const startTime = document.getElementById("startTime")?.value || "N/A";
+  const endTime = document.getElementById("endTime")?.value || "N/A";
+  // Assume you have a variable or form field indicating payment type
+  const paymentType = window._stripePaymentType === "full" ? "Full Price" : "Deposit";
+
+  // Format the message
+  const message = `New Order!
+Name: ${name}
+Phone: ${phone}
+Location: ${location}
+Rental Dates: ${rentalDates}
+Start Time: ${startTime}
+End Time: ${endTime}
+Payment: ${paymentType}`;
+
+  // Send to Telegram
+  sendTelegramMessage(message);
+
+  // Finish existing logic
   localStorage.removeItem('cart');
   updateCartCount && updateCartCount();
-  // You can add Telegram notification, etc. here if needed.
 }
 
 // Telegram notification function (optional)
 function sendTelegramMessage(name, phone, location, rentalDates, startTime, endTime, paymentType) {
   const telegramBotToken = 'your_telegram_bot_token'; // Replace!
   const chatId = 'your_chat_id'; // Replace!
-  const url = `https://api.telegram.org/bot${telegramBotToken}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(
-    `User: ${name} | Phone: ${phone} | Location: ${location} | Rental Dates: ${rentalDates} | Start: ${startTime} | End: ${endTime} | Payment: ${paymentType}`
-  )}`;
-  fetch(url)
+  const message = `User: ${name} | Phone: ${phone} | Location: ${location} | Rental Dates: ${rentalDates} | Start: ${startTime} | End: ${endTime} | Payment: ${paymentType}`;
+  const url = `https://api.telegram.org/bot${telegramBotToken}/sendMessage`;
+
+  fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      chat_id: chatId,
+      text: message,
+    })
+  })
     .then(response => response.json())
     .then(data => {
       if (data.ok) {
