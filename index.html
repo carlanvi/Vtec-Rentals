@@ -659,173 +659,154 @@ textarea {
 <script src="https://js.stripe.com/v3/"></script> <!-- Include Stripe.js -->
 <script>
   let stripe;
-let elements;
-let card;
+  let elements;
+  let card;
 
-document.addEventListener('DOMContentLoaded', function () {
-  // Pay Full Price button click event
-  document.getElementById('payFullPrice').addEventListener('click', () => {
-    handlePayment('full');  // Trigger full payment
-  });
+  document.addEventListener('DOMContentLoaded', function () {
+    // Pay Full Price button click event
+    document.getElementById('payFullPrice').addEventListener('click', () => {
+      handlePayment('full');  // Trigger full payment
+    });
 
-  // Pay Deposit button click event
-  document.getElementById('payDeposit').addEventListener('click', () => {
-    handlePayment('deposit');  // Trigger deposit payment (25%)
-  });
-});
-
-// Function to handle Full Payment or Deposit Payment
-function handlePayment(paymentType) {
-  const fields = [
-    document.getElementById("customerName"),
-    document.getElementById("customerPhone"),
-    document.getElementById("customerLocation"),
-    document.getElementById("rentalDateRange"),
-    document.getElementById("startTime"),
-    document.getElementById("endTime")
-  ];
-
-  let firstError = null;
-
-  // Validate fields
-  fields.forEach(field => {
-    field.classList.remove("error");
-    if (!field.value.trim()) {
-      field.classList.add("error");
-      if (!firstError) firstError = field;
-    }
-  });
-
-  // If there's an error, focus on the first invalid field
-  if (firstError) {
-    firstError.focus();
-    return;
-  }
-
-  // Get values of the fields
-  const name = fields[0].value.trim();
-  const phone = fields[1].value.trim();
-  const location = fields[2].value.trim();
-  const rentalDates = fields[3].value.trim();
-  const startTime = fields[4].value.trim();
-  const endTime = fields[5].value.trim();
-
-  // Hide the Cart Modal after checkout button click
-  const cartModal = document.getElementById('cartModal');
-  cartModal.style.display = 'none';  // This closes the cart modal
-
-  // Show Payment Options Modal for card details input
-  const paymentOptionsModal = document.getElementById('paymentOptionsModal');
-  paymentOptionsModal.style.display = 'block'; // Show the payment options modal
-
-  // Initialize Stripe and Elements
-  stripe = Stripe('your_stripe_publishable_key'); // Replace with your Stripe publishable key
-  elements = stripe.elements();
-
-  // Create an instance of the card Element
-  card = elements.create('card', {
-    style: {
-      base: {
-        color: '#32325d',
-        fontFamily: '"Helvetica Neue", Helvetica, sans-serif',
-        fontSmoothing: 'antialiased',
-        fontSize: '16px',
-        '::placeholder': {
-          color: '#aab7c4',
-        },
-      },
-    },
-  });
-  card.mount('#card-element'); // Mount the card input field
-
-  // Get the cart total from localStorage or your cart system
-  const cartTotal = getCartTotal();  // Example: replace with your actual cart total
-  const paymentAmount = paymentType === 'full' ? cartTotal : cartTotal * 0.25; // If deposit, charge 25%
-
-  // Create PaymentIntent for the amount
-  fetch('/create-payment-intent', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ paymentAmount }) // Send the payment amount to the server
-  })
-  .then((response) => response.json())
-  .then((data) => {
-    const clientSecret = data.clientSecret;
-
-    // Add an event listener to handle form submission
-    document.getElementById('submitPayment').addEventListener('click', () => {
-      handleStripePayment(clientSecret, name, phone, location, rentalDates, startTime, endTime, paymentType);
+    // Pay Deposit button click event
+    document.getElementById('payDeposit').addEventListener('click', () => {
+      handlePayment('deposit');  // Trigger deposit payment (25%)
     });
   });
-}
 
-// Function to handle Stripe payment
-function handleStripePayment(clientSecret, name, phone, location, rentalDates, startTime, endTime, paymentType) {
-  stripe.confirmCardPayment(clientSecret, {
-    payment_method: {
-      card: card,
-    },
-  })
-  .then(function(result) {
-    if (result.error) {
-      alert(result.error.message);  // Handle any errors from Stripe
-    } else {
-      if (result.paymentIntent.status === 'succeeded') {
-        alert("Payment successful!");
-        completeBooking(name, phone, location, rentalDates, startTime, endTime, paymentType);
-      }
-    }
-  });
-}
-
-// Function to finalize the booking and clear cart
-function completeBooking(name, phone, location, rentalDates, startTime, endTime, paymentType) {
-  const cart = JSON.parse(localStorage.getItem('cart')) || [];
-  localStorage.removeItem('cart'); // Clear the cart from local storage
-  updateCartCount(); // Update cart count here (ensure this function exists)
-
-  // Send details to Telegram (optional)
-  sendTelegramMessage(name, phone, location, rentalDates, startTime, endTime, paymentType);
-}
-
-// Function to get the cart total (replace this with actual logic to calculate the cart total)
-function getCartTotal() {
-  const cart = JSON.parse(localStorage.getItem('cart')) || [];
-  let total = 0;
-  cart.forEach(item => {
-    total += item.price * item.quantity;  // Assuming each item in the cart has 'price' and 'quantity'
-  });
-  return total;
-}
-
-// Function to send a message to Telegram bot
-function sendTelegramMessage(name, phone, location, rentalDates, startTime, endTime, paymentType) {
-  const telegramBotToken = 'your_telegram_bot_token'; // Replace with your bot's token
-  const chatId = 'your_chat_id'; // Replace with your chat ID
-
-  const url = `https://api.telegram.org/bot${telegramBotToken}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(
-    `User: ${name} | Phone: ${phone} | Location: ${location} | Rental Dates: ${rentalDates} | Start: ${startTime} | End: ${endTime} | Payment: ${paymentType}`
-  )}`;
-
-  fetch(url)
-    .then(response => response.json())
-    .then(data => {
-      if (data.ok) {
-        console.log('Message sent successfully!');
-      } else {
-        console.error('Error sending message:', data);
-      }
-    })
-    .catch(error => console.error('Error:', error));
-}
+  // Function to handle Full Payment or Deposit Payment
+  function handlePayment(paymentType) {
+    const fields = [
+      document.getElementById("customerName"),
+      document.getElementById("customerPhone"),
+      document.getElementById("customerLocation"),
+      document.getElementById("rentalDateRange"),
+      document.getElementById("startTime"),
+      document.getElementById("endTime")
+    ];
 
     let firstError = null;
 
     // Validate fields
     fields.forEach(field => {
       field.classList.remove("error");
+      if (!field.value.trim()) {
+        field.classList.add("error");
+        if (!firstError) firstError = field;
+      }
+    });
+
+    // If there's an error, focus on the first invalid field
+    if (firstError) {
+      firstError.focus();
+      return;
+    }
+
+    // Get values of the fields
+    const name = fields[0].value.trim();
+    const phone = fields[1].value.trim();
+    const location = fields[2].value.trim();
+    const rentalDates = fields[3].value.trim();
+    const startTime = fields[4].value.trim();
+    const endTime = fields[5].value.trim();
+
+    // Hide the Cart Modal after checkout button click
+    const cartModal = document.getElementById('cartModal');
+    cartModal.style.display = 'none';  // This closes the cart modal
+
+    // Show Payment Options Modal for card details input
+    const paymentOptionsModal = document.getElementById('paymentOptionsModal');
+    paymentOptionsModal.style.display = 'block'; // Show the payment options modal
+
+    // Initialize Stripe and Elements
+    stripe = Stripe('your_stripe_publishable_key'); // Replace with your Stripe publishable key
+    elements = stripe.elements();
+
+    // Create an instance of the card Element
+    card = elements.create('card', {
+      style: {
+        base: {
+          color: '#32325d',
+          fontFamily: '"Helvetica Neue", Helvetica, sans-serif',
+          fontSmoothing: 'antialiased',
+          fontSize: '16px',
+          '::placeholder': {
+            color: '#aab7c4',
+          },
+        },
+      },
+    });
+    card.mount('#card-element'); // Mount the card input field
+
+    // Calculate total (for simplicity, we assume cartTotal is a fixed value here)
+    const cartTotal = 100; // Example total amount (this should come from your cart data)
+    const paymentAmount = paymentType === 'full' ? cartTotal : cartTotal * 0.25; // If deposit, charge 25%
+
+    // Create PaymentIntent for the amount
+    fetch('/create-payment-intent', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ paymentAmount }) // Send the payment amount to the server
+    })
+    .then((response) => response.json())
+    .then((data) => {
+      const clientSecret = data.clientSecret;
+
+      // Add an event listener to handle form submission
+      document.getElementById('submitPayment').addEventListener('click', () => {
+        handleStripePayment(clientSecret);
+      });
+    });
+  }
+
+  // Function to handle Stripe payment
+  function handleStripePayment(clientSecret) {
+    stripe.confirmCardPayment(clientSecret, {
+      payment_method: {
+        card: card,
+      },
+    })
+    .then(function(result) {
+      if (result.error) {
+        alert(result.error.message);  // Handle any errors from Stripe
+      } else {
+        if (result.paymentIntent.status === 'succeeded') {
+          alert("Payment successful!");
+          completeBooking();
+        }
+      }
+    });
+  }
+
+  // Function to finalize the booking and clear cart
+  function completeBooking() {
+    const cart = JSON.parse(localStorage.getItem('cart')) || [];
+    localStorage.removeItem('cart'); // Clear the cart from local storage
+    updateCartCount(); // Update cart count here (ensure this function exists)
+  }
+
+  // Function to send a message to Telegram bot
+  function sendTelegramMessage(name, phone, location, rentalDates, startTime, endTime, paymentType) {
+    const telegramBotToken = 'your_telegram_bot_token'; // Replace with your bot's token
+    const chatId = 'your_chat_id'; // Replace with your chat ID
+
+    const url = `https://api.telegram.org/bot${telegramBotToken}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(
+      `User: ${name} | Phone: ${phone} | Location: ${location} | Rental Dates: ${rentalDates} | Start: ${startTime} | End: ${endTime} | Payment: ${paymentType}`
+    )}`;
+
+    fetch(url)
+      .then(response => response.json())
+      .then(data => {
+        if (data.ok) {
+          console.log('Message sent successfully!');
+        } else {
+          console.error('Error sending message:', data);
+        }
+      })
+      .catch(error => console.error('Error:', error));
+  }
 
     
     let currentUser = null;
