@@ -1563,6 +1563,22 @@ function removeItem(index) {
     toast.style.display = 'none';
   }, 2500);
 }
+
+  // Show the modal when "Pay Now" is clicked
+function showPaymentModal() {
+  document.getElementById('paymentOptionsModal').style.display = 'block';
+  document.getElementById('paymentOptionsModal').style.opacity = '1';
+}
+
+// Close the modal when the user clicks the "Close" button or anywhere outside the modal
+document.getElementById('closePaymentModal').addEventListener('click', function() {
+  document.getElementById('paymentOptionsModal').style.display = 'none';
+  document.getElementById('paymentOptionsModal').style.opacity = '0';
+});
+
+// To show the payment modal on your page (triggered by clicking a button):
+document.getElementById('trigger-payment-modal').addEventListener('click', showPaymentModal);
+
   </script>
   </body>
 </html>
