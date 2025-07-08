@@ -923,8 +923,7 @@ function completeBooking() {
   // Telegram notification function
   function sendTelegramMessage(name, phone, location, rentalDates, startTime, endTime, paymentType) {
     const telegramBotToken = '7638261664:AAGm0MNVQxN0hlW1bhXBRf-kSRuMgRkCLC8'; // Replace!
-    const chatId = '1002734216867
-'; // Replace!
+    const chatId = '-1002734216867'; // Replace!
     const message = `User: ${name} | Phone: ${phone} | Location: ${location} | Rental Dates: ${rentalDates} | Start: ${startTime} | End: ${endTime} | Payment: ${paymentType}`;
     const url = `https://api.telegram.org/bot${telegramBotToken}/sendMessage`;
 
