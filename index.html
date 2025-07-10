@@ -984,30 +984,57 @@ function completeBooking() {
 });
 
   // Telegram notification function
-  function sendTelegramMessage(name, phone, location, rentalDates, startTime, endTime, paymentType) {
-    const telegramBotToken = '7638261664:AAGm0MNVQxN0hlW1bhXBRf-kSRuMgRkCLC8'; // Replace!
-    const chatId = '-1002734216867'; // Replace!
-    const message = `User: ${name} | Phone: ${phone} | Location: ${location} | Rental Dates: ${rentalDates} | Start: ${startTime} | End: ${endTime} | Payment: ${paymentType}`;
-    const url = `https://api.telegram.org/bot${telegramBotToken}/sendMessage`;
+function sendTelegramMessage(name, phone, location, rentalDates, startTime, endTime, paymentType) {
+  const telegramBotToken = '7638261664:AAGm0MNVQxN0hlW1bhXBRf-kSRuMgRkCLC8'; // Replace!
+  const chatId = '-1002734216867'; // Replace!
 
-    fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        chat_id: chatId,
-        text: message,
-      })
+  const cart = JSON.parse(localStorage.getItem('cart')) || [];
+
+  let itemsSummary = cart.map(item => {
+    const qty = item.quantity || 1;
+    const days = item.days || 1;
+    const total = (item.price * qty * days).toFixed(2);
+    return `• ${item.name} (x${qty}, ${days} day${days > 1 ? 's' : ''}) = $${total}`;
+  }).join('\n');
+
+  const totalAmount = (window._stripePaymentAmount / 100).toFixed(2);
+
+  const message = `
+🛒 New Reservation
+
+👤 Name: ${name}
+📞 Phone: ${phone}
+📍 Location: ${location}
+
+📅 Dates: ${rentalDates}
+⏰ Time: ${startTime} to ${endTime}
+💳 Payment: ${paymentType}
+💰 Amount Paid: $${totalAmount}
+
+🧾 Cart Items:
+${itemsSummary}
+  `.trim();
+
+  const url = `https://api.telegram.org/bot${telegramBotToken}/sendMessage`;
+
+  fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      chat_id: chatId,
+      text: message,
+      parse_mode: 'Markdown'
     })
-    .then(response => response.json())
-    .then(data => {
-      if (data.ok) {
-        console.log('Message sent successfully!');
-      } else {
-        console.error('Error sending message:', data);
-      }
-    })
-    .catch(error => console.error('Error:', error));
-  }
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.ok) {
+      console.log('Message sent successfully!');
+    } else {
+      console.error('Telegram API error:', data);
+    }
+  })
+  .catch(error => console.error('Fetch error:', error));
 }
 
   function isBookingAvailable(newStart, newEnd, bookings) {
