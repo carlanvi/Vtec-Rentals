@@ -941,14 +941,17 @@ async function handlePayment(paymentType) {
   document.getElementById('cartModal').style.display = 'none';
   showPaymentModal();
   
-  // Payment calculation
+  // Payment calculation (must be BEFORE showPaymentModal)
   const cartTotal = getCartTotal();
   window._stripeCartTotal = cartTotal;
   window._stripePaymentAmount = paymentType === 'full'
     ? cartTotal
     : Math.round(cartTotal * 0.25);
   window._stripePaymentType = paymentType;
-}
+
+  document.getElementById('cartModal').style.display = 'none';
+  showPaymentModal();  // ✅ Now it works
+
 
 function completeBooking() {
   // Get details from your form or page
