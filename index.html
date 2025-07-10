@@ -889,7 +889,6 @@ document.getElementById('payDeposit').addEventListener('click', () => {
 
 // Main payment handler
 async function handlePayment(paymentType) {
-async function handlePayment(paymentType) {
   // Fetch all bookings and check for overlaps
   const selectedDates = document.getElementById("rentalDateRange").value.split(" to ");
   const selectedStart = new Date(`${selectedDates[0]}T${document.getElementById("startTime").value}`);
