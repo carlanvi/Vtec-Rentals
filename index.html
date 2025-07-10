@@ -937,21 +937,19 @@ async function handlePayment(paymentType) {
     firstError.focus();
     return;
   }
-
-  document.getElementById('cartModal').style.display = 'none';
-  showPaymentModal();
   
-  // Payment calculation (must be BEFORE showPaymentModal)
-  const cartTotal = getCartTotal();
-  window._stripeCartTotal = cartTotal;
-  window._stripePaymentAmount = paymentType === 'full'
-    ? cartTotal
-    : Math.round(cartTotal * 0.25);
-  window._stripePaymentType = paymentType;
+  // Calculate payment amount FIRST
+const cartTotal = getCartTotal();
+window._stripeCartTotal = cartTotal;
+window._stripePaymentAmount = paymentType === 'full'
+  ? cartTotal
+  : Math.round(cartTotal * 0.25);
+window._stripePaymentType = paymentType;
 
-  document.getElementById('cartModal').style.display = 'none';
-  showPaymentModal();  // ✅ Now it works
-
+// THEN show modal
+document.getElementById('cartModal').style.display = 'none';
+showPaymentModal();
+}
 
 function completeBooking() {
   // Get details from your form or page
