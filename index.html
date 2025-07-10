@@ -939,9 +939,8 @@ async function handlePayment(paymentType) {
   }
 
   document.getElementById('cartModal').style.display = 'none';
-  // showPaymentModal();  ← disable the real payment modal
-  completeBooking();      // ← trigger booking directly
-
+  showPaymentModal();
+  
   // Payment calculation
   const cartTotal = getCartTotal();
   window._stripeCartTotal = cartTotal;
