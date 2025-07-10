@@ -888,33 +888,49 @@ document.getElementById('payDeposit').addEventListener('click', () => {
   }
 
 // Main payment handler
-function handlePayment(paymentType) {
-  // Fetch all bookings and check for overlaps
-const selectedDates = document.getElementById("rentalDateRange").value.split(" to ");
-const selectedStart = new Date(`${selectedDates[0]}T${document.getElementById("startTime").value}`);
-const selectedEnd = new Date(`${selectedDates[1]}T${document.getElementById("endTime").value}`);
+async function handlePayment(paymentType) {
+  // Validate and extract selected dates
+  const rentalDateRange = document.getElementById("rentalDateRange").value;
+  const [startDateStr, endDateStr] = rentalDateRange.split(" to ");
+  const startTime = document.getElementById("startTime").value;
+  const endTime = document.getElementById("endTime").value;
 
-const snapshot = await db.collection("reservations").get();
-let conflict = false;
-
-snapshot.forEach(doc => {
-  const data = doc.data();
-  if (data.rentalDates && data.startTime && data.endTime) {
-    const [startStr, endStr] = data.rentalDates.split(" to ");
-    const existingStart = new Date(`${startStr}T${data.startTime}`);
-    const existingEnd = new Date(`${endStr}T${data.endTime}`);
-
-    if (selectedStart < existingEnd && selectedEnd > existingStart) {
-      conflict = true;
-    }
+  if (!startDateStr || !endDateStr || !startTime || !endTime) {
+    alert("Please select a valid date and time range.");
+    return;
   }
-});
 
-if (conflict) {
-  alert("The selected rental period overlaps with an existing booking. Please choose a different date or time.");
-  return;
-}
-  
+  const selectedStart = new Date(`${startDateStr}T${startTime}`);
+  const selectedEnd = new Date(`${endDateStr}T${endTime}`);
+
+  if (selectedEnd <= selectedStart) {
+    alert("End time must be after start time.");
+    return;
+  }
+
+  // Check for overlapping bookings
+  const snapshot = await db.collection("reservations").get();
+  let conflict = false;
+
+  snapshot.forEach(doc => {
+    const data = doc.data();
+    if (data.rentalDates && data.startTime && data.endTime) {
+      const [bookedStartStr, bookedEndStr] = data.rentalDates.split(" to ");
+      const bookedStart = new Date(`${bookedStartStr}T${data.startTime}`);
+      const bookedEnd = new Date(`${bookedEndStr}T${data.endTime}`);
+
+      if (selectedStart < bookedEnd && selectedEnd > bookedStart) {
+        conflict = true;
+      }
+    }
+  });
+
+  if (conflict) {
+    alert("The selected rental period overlaps with an existing booking.");
+    return;
+  }
+
+  // Validate fields
   const fields = [
     document.getElementById("customerName"),
     document.getElementById("customerPhone"),
@@ -938,17 +954,23 @@ if (conflict) {
     return;
   }
 
-  document.getElementById('cartModal').style.display = 'none';
-  // showPaymentModal();  ← disable the real payment modal
-completeBooking();      // ← trigger booking directly
-
-  // Payment calculation
+  // Calculate total & payment amount
   const cartTotal = getCartTotal();
+  if (cartTotal === 0) {
+    alert("Cart is empty. Add items first.");
+    return;
+  }
+
   window._stripeCartTotal = cartTotal;
   window._stripePaymentAmount = paymentType === 'full'
     ? cartTotal
     : Math.round(cartTotal * 0.25);
   window._stripePaymentType = paymentType;
+
+  document.getElementById('cartModal').style.display = 'none';
+
+  // Show Stripe payment modal
+  showPaymentModal();
 }
 
 function completeBooking() {
