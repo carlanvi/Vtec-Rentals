@@ -928,13 +928,10 @@ function handlePayment(paymentType) {
   // Hide cart modal
   document.getElementById('cartModal').style.display = 'none';
 
-  // Skip real Stripe modal, and trigger booking directly
-  completeBooking(); // Direct confirmation
-  // showPaymentModal(); // ← Keep disabled for now
+showPaymentModal();
 }
 
-function completeBooking() {
-  // Get form values
+async function completeBooking() {
   const name = document.getElementById("customerName")?.value || "N/A";
   const phone = document.getElementById("customerPhone")?.value || "N/A";
   const location = document.getElementById("customerLocation")?.value || "N/A";
@@ -946,11 +943,66 @@ function completeBooking() {
   const cart = JSON.parse(localStorage.getItem('cart')) || [];
   const totalAmount = (window._stripePaymentAmount / 100).toFixed(2);
 
-  // ✅ Call Telegram
+  const [startDateStr, endDateStr] = rentalDates.split(" to ");
+  const start = new Date(startDateStr);
+  const end = new Date(endDateStr);
+
+  // 🔍 Load all bookings from Firestore
+  const snapshot = await db.collection("reservations").get();
+
+  for (const cartItem of cart) {
+    const itemName = cartItem.name;
+    const qtyRequested = cartItem.quantity || 1;
+
+    // 🔎 Get max stock from global qtyMap or default to 1
+    const stockAvailable = qtyMap[itemName]?.options?.slice(-1)[0] || 1;
+
+    const bookedQtyPerDate = {};
+
+    for (const doc of snapshot.docs) {
+      const data = doc.data();
+      if (!data.rentalDates || !data.cartItems) continue;
+
+      const [bookedStartStr, bookedEndStr] = data.rentalDates.split(" to ");
+      const bookedStart = new Date(bookedStartStr);
+      const bookedEnd = new Date(bookedEndStr);
+
+      if (start > bookedEnd || end < bookedStart) continue;
+
+      for (const bookedItem of data.cartItems) {
+        if (bookedItem.name !== itemName) continue;
+
+        const bookedQty = bookedItem.quantity || 1;
+        let d = new Date(bookedStart);
+        while (d <= bookedEnd) {
+          const key = d.toISOString().split("T")[0];
+          bookedQtyPerDate[key] = (bookedQtyPerDate[key] || 0) + bookedQty;
+          d.setDate(d.getDate() + 1);
+        }
+      }
+    }
+
+    // 🚫 Check for overbooking on each date
+    let d = new Date(start);
+    while (d <= end) {
+      const key = d.toISOString().split("T")[0];
+      const alreadyBooked = bookedQtyPerDate[key] || 0;
+      if (alreadyBooked + qtyRequested > stockAvailable) {
+        Swal.fire({
+          icon: "error",
+          title: "Item Overbooked",
+          text: `${itemName} is overbooked on ${key}. Only ${stockAvailable - alreadyBooked} left.`,
+        });
+        return;
+      }
+      d.setDate(d.getDate() + 1);
+    }
+  }
+
+  // ✅ Proceed with Telegram & Firestore save
   sendTelegramMessage(name, phone, location, rentalDates, startTime, endTime, paymentType, cart, totalAmount);
 
-  // ✅ Save to Firestore
-  db.collection("reservations").add({
+  await db.collection("reservations").add({
     name,
     phone,
     location,
@@ -961,19 +1013,11 @@ function completeBooking() {
     cartItems: cart,
     amountPaid: Number(totalAmount),
     createdAt: firebase.firestore.FieldValue.serverTimestamp()
-  })
-  .then(() => {
-    console.log("Reservation added to Firestore!");
-  })
-  .catch((error) => {
-    console.error("Error adding reservation: ", error);
   });
 
-  // ✅ Clear cart and update UI
-  localStorage.removeItem('cart');
+  localStorage.removeItem("cart");
   updateCartCount && updateCartCount();
 
-  // ✅ SweetAlert Confirmation
   Swal.fire({
     title: 'ORDER MADE',
     html: `
@@ -996,6 +1040,7 @@ function completeBooking() {
     }
   });
 }
+
 
   // Telegram notification function
 function sendTelegramMessage(name, phone, location, rentalDates, startTime, endTime, paymentType, cart, totalAmount) {
@@ -1297,8 +1342,8 @@ function deleteReview(docId) {
 
   const qtyMap = {
     "CROSSBACK CHAIRS": {
-      options: [10, 20, 50, 100],
-      prices: { 10: 30, 20: 55, 50: 120, 100: 200 }
+      options: [10, 20, 50, 100, 200],
+      prices: { 10: 30, 20: 55, 50: 120, 100: 200, 200: 300 }
     },
     "PLASTIC TABLES": {
       options: [2, 4, 6],
