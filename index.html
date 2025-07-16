@@ -603,49 +603,59 @@ textarea {
   <div id="reviewsContainer" style="max-width: 600px; margin: 0 auto; color: white;"></div>
 </div>
 
-  <!-- Cart Modal -->
+<!-- Cart Modal -->
 <div id="cartModal" style="display: none;"> <!-- Initially hidden -->
-  <button id="closeCheckoutBtn" style="position: absolute; top: 10px; right: 15px; font-size: 20px; background: none; border: none; color: #6A0DAD; cursor: pointer;">
-  ✖
-</button>
+  <div style="position: relative;"> <!-- Wrapper to position the ✖ correctly -->
+
+    <button id="closeCheckoutBtn" style="position: absolute; top: 10px; right: 15px; font-size: 20px; background: none; border: none; color: #6A0DAD; cursor: pointer;">
+      ✖
+    </button>
 
     <div>
-        <h2>YOUR CART</h2>
-        <div style="margin-bottom: 10px;">
-            <label for="customerName"><strong>Your Name:</strong></label>
-            <input type="text" id="customerName" placeholder="Enter your name" style="width: 100%; padding: 10px;" required />
+      <h2>YOUR CART</h2>
+
+      <div style="margin-bottom: 10px;">
+        <label for="customerName"><strong>Your Name:</strong></label>
+        <input type="text" id="customerName" placeholder="Enter your name" style="width: 100%; padding: 10px;" required />
+      </div>
+
+      <div style="margin-bottom: 15px;">
+        <label for="customerPhone"><strong>Phone Number:</strong></label>
+        <input type="tel" id="customerPhone" placeholder="Enter phone number" style="width: 100%; padding: 10px;" required />
+      </div>
+
+      <div style="margin-bottom: 15px;">
+        <label for="rentalDateRange"><strong>Select Rental Dates:</strong></label>
+        <input id="rentalDateRange" placeholder="Select start and end date" style="width: 100%; padding: 10px;" />
+      </div>
+
+      <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+        <div style="flex: 1;">
+          <label for="startTime">Start Time:</label>
+          <input type="time" id="startTime" style="width: 100%; padding: 10px;" />
         </div>
-        <div style="margin-bottom: 15px;">
-            <label for="customerPhone"><strong>Phone Number:</strong></label>
-            <input type="tel" id="customerPhone" placeholder="Enter phone number" style="width: 100%; padding: 10px;" required />
+        <div style="flex: 1;">
+          <label for="endTime">End Time:</label>
+          <input type="time" id="endTime" style="width: 100%; padding: 10px;" />
         </div>
-        <div style="margin-bottom: 15px;">
-            <label for="rentalDateRange"><strong>Select Rental Dates:</strong></label>
-            <input id="rentalDateRange" placeholder="Select start and end date" style="width: 100%; padding: 10px;" />
-        </div>
-        <div style="display: flex; gap: 10px; margin-bottom: 10px;">
-            <div style="flex: 1;">
-                <label for="startTime">Start Time:</label>
-                <input type="time" id="startTime" style="width: 100%; padding: 10px;" />
-            </div>
-            <div style="flex: 1;">
-                <label for="endTime">End Time:</label>
-                <input type="time" id="endTime" style="width: 100%; padding: 10px;" />
-            </div>
-        </div>
-        <div style="margin-bottom: 15px;">
-            <label for="customerLocation"><strong>Location:</strong></label>
-            <input type="text" id="customerLocation" placeholder="Enter delivery location" style="width: 100%; padding: 10px;" required />
-        </div>
-        <div id="cartItemsContainer"></div>
-        <div id="cartTotal" style="text-align:right; font-weight:bold; margin-top: 10px;"></div>
-        <div id="cartButtons">
-            <!-- Renamed 'Close' and 'Checkout' buttons with payment options -->
-            <button id="payDeposit" class="payment-button">DEPOSIT (25%) & REST ON ARRIVAL</button>
-          <button id="payFullPrice" class="payment-button">PAY NOW</button>
-        </div>
+      </div>
+
+      <div style="margin-bottom: 15px;">
+        <label for="customerLocation"><strong>Location:</strong></label>
+        <input type="text" id="customerLocation" placeholder="Enter delivery location" style="width: 100%; padding: 10px;" required />
+      </div>
+
+      <div id="cartItemsContainer"></div>
+      <div id="cartTotal" style="text-align:right; font-weight:bold; margin-top: 10px;"></div>
+
+      <div id="cartButtons">
+        <button id="payDeposit" class="payment-button">DEPOSIT (25%) & REST ON ARRIVAL</button>
+        <button id="payFullPrice" class="payment-button">PAY NOW</button>
+      </div>
     </div>
+  </div>
 </div>
+
 
 <!-- Payment Modal Popup -->
 <div id="paymentOptionsModal" class="payment-modal">
