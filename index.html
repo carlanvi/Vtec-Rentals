@@ -1400,8 +1400,8 @@ function deleteReview(docId) {
   <div class="gallery-category">
     <h3>${categoryFilter}</h3>
     ${categoryFilter === 'EVENT SETUP' ? `
-      <p style="margin-top: 5px; font-size: 16px; color: #666;">
-       DELIVERY ONLY NO SETUP INCLUDED!!
+      <p style="margin-top: 5px; font-size: 16px; color: red; text-align: center;">
+        DELIVERY ONLY NO SETUP INCLUDED!!
       </p>
     ` : ''}
     <div class="gallery-wrapper">
@@ -1409,6 +1409,7 @@ function deleteReview(docId) {
     </div>
   </div>
 `;
+
 
 
       const categoryContainer = document.getElementById(`gallery-${categoryFilter}`);
