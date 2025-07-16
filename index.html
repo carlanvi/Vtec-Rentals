@@ -733,11 +733,6 @@ textarea {
 
   let bookedDates = [];
 
-  <script>
-  document.getElementById("closeCheckoutBtn").addEventListener("click", function () {
-    document.getElementById("cartModal").style.display = "none";
-  });
-
 
 function fetchBookedDatesAndInitCalendar() {
   db.collection("reservations").get().then(snapshot => {
@@ -1754,6 +1749,11 @@ function removeItem(index) {
     toast.style.display = 'none';
   }, 2500);
 }
+
+  <script>
+  document.getElementById("closeCheckoutBtn").addEventListener("click", function () {
+    document.getElementById("cartModal").style.display = "none";
+  });
 
   </script>
   </body>
