@@ -605,6 +605,10 @@ textarea {
 
   <!-- Cart Modal -->
 <div id="cartModal" style="display: none;"> <!-- Initially hidden -->
+  <button id="closeCheckoutBtn" style="position: absolute; top: 10px; right: 15px; font-size: 20px; background: none; border: none; color: #6A0DAD; cursor: pointer;">
+  ✖
+</button>
+
     <div>
         <h2>YOUR CART</h2>
         <div style="margin-bottom: 10px;">
@@ -718,6 +722,11 @@ textarea {
     });
 
   let bookedDates = [];
+
+  document.getElementById("viewCartBtn").addEventListener("click", function() {
+  document.getElementById("checkoutContainer").style.display = "block";
+});
+
 
 function fetchBookedDatesAndInitCalendar() {
   db.collection("reservations").get().then(snapshot => {
