@@ -1397,13 +1397,19 @@ function deleteReview(docId) {
       }
 
       galleryContainer.innerHTML = `
-        <div class="gallery-category">
-          <h3>${categoryFilter}</h3>
-          <div class="gallery-wrapper">
-            <div class="gallery-grid" id="gallery-${categoryFilter}"></div>
-          </div>
-        </div>
-      `;
+  <div class="gallery-category">
+    <h3>${categoryFilter}</h3>
+    ${categoryFilter === 'EVENT SETUP' ? `
+      <p style="margin-top: 5px; font-size: 16px; color: #666;">
+       ITEMS FROM THIS SECTION ARE ONLY DELIVERED NO SETUP INCLUDED!!
+      </p>
+    ` : ''}
+    <div class="gallery-wrapper">
+      <div class="gallery-grid" id="gallery-${categoryFilter}"></div>
+    </div>
+  </div>
+`;
+
 
       const categoryContainer = document.getElementById(`gallery-${categoryFilter}`);
 
