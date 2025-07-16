@@ -249,27 +249,38 @@
     }
 
     function addPhotoUrl() {
-      const urlInput = document.getElementById('photoUrlInput');
-      const categorySelect = document.getElementById('photoCategorySelect');
-      const url = urlInput.value.trim();
-      const category = categorySelect.value.trim();
+  const nameInput = document.getElementById('itemNameInput');
+  const urlInput = document.getElementById('photoUrlInput');
+  const categorySelect = document.getElementById('photoCategorySelect');
 
-      if (url === '' || category === '') {
-        alert('Please enter a valid image URL and select a category.');
-        return;
-      }
+  const name = nameInput.value.trim();
+  const url = urlInput.value.trim();
+  const category = categorySelect.value.trim();
 
-      db.collection('gallery').add({ url: url, category: category })
-        .then(() => {
-          urlInput.value = '';
-          categorySelect.value = '';
-          alert('Photo added successfully!');
-        })
-        .catch(error => {
-          console.error("Error adding document: ", error);
-          alert('Error adding photo: ' + error.message);
-        });
-    }
+  // Validate all fields
+  if (name === '' || url === '' || category === '') {
+    alert('Please enter a name, valid image URL, and select a category.');
+    return;
+  }
+
+  // Save to Firebase
+  db.collection('gallery').add({
+    name: name,
+    url: url,
+    category: category
+  })
+  .then(() => {
+    nameInput.value = '';
+    urlInput.value = '';
+    categorySelect.value = '';
+    alert('Item added successfully!');
+  })
+  .catch(error => {
+    console.error("Error adding item: ", error);
+    alert('Error adding item: ' + error.message);
+  });
+}
+
 
     function loadGallery() {
       const galleryContainer = document.getElementById('adminGallery');
