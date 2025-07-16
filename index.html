@@ -733,9 +733,10 @@ textarea {
 
   let bookedDates = [];
 
-  document.getElementById("viewCartBtn").addEventListener("click", function() {
-  document.getElementById("checkoutContainer").style.display = "block";
-});
+  <script>
+  document.getElementById("closeCheckoutBtn").addEventListener("click", function () {
+    document.getElementById("cartModal").style.display = "none";
+  });
 
 
 function fetchBookedDatesAndInitCalendar() {
