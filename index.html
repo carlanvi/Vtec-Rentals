@@ -1363,7 +1363,7 @@ function deleteReview(docId) {
     },
     "PLASTIC TABLE": {
       options: [1, 2, 4, 6],
-      prices: {1: 10, 2: 20, 4: 35, 6: 50 }
+      prices: { 1: 10, 2: 20, 4: 35, 6: 50 }
     },
     "Podium": {
       options: [1, 2, 3],
@@ -1401,6 +1401,7 @@ function deleteReview(docId) {
       options: [2, 4, 6],
       prices: { 2: 10, 4: 18, 6: 25 }
     }
+    // Add car models here if they use custom pricing
   };
 
   db.collection('gallery')
@@ -1413,19 +1414,66 @@ function deleteReview(docId) {
       }
 
       galleryContainer.innerHTML = `
-  <div class="gallery-category">
-    <h3>${categoryFilter}</h3>
-    ${categoryFilter === 'EVENT ITEMS' ? `
-      <p style="margin-top: 3px; font-size: 18px; font-weight: bold; color: #6A0DAD; text-align: center;">
-        DELIVERY ONLY. SETUP NOT INCLUDED!!
-      </p>
-    ` : ''}
-    <div class="gallery-wrapper">
-      <div class="gallery-grid" id="gallery-${categoryFilter}"></div>
-    </div>
-  </div>
-`;
+        <div class="gallery-category">
+          <h3>${categoryFilter}</h3>
+          ${categoryFilter === 'EVENT ITEMS' ? `
+            <p style="margin-top: 3px; font-size: 18px; font-weight: bold; color: #6A0DAD; text-align: center;">
+              DELIVERY ONLY. SETUP NOT INCLUDED!!
+            </p>
+          ` : ''}
+          <div class="gallery-wrapper">
+            <div class="gallery-grid" id="gallery-${categoryFilter}"></div>
+          </div>
+        </div>
+      `;
 
+      const categoryContainer = document.getElementById(`gallery-${categoryFilter}`);
+
+      querySnapshot.forEach((doc) => {
+        const data = doc.data();
+        const imageUrl = data.url;
+        const name = data.name || 'Unnamed';
+        const itemId = name.replace(/\s+/g, '-');
+        let price = data.price || 0;
+
+        let quantityOptions = [1];
+        let quantityPrices = { 1: price };
+
+        if (qtyMap[name]) {
+          quantityOptions = qtyMap[name].options;
+          quantityPrices = qtyMap[name].prices;
+        }
+
+        const optionsHTML = quantityOptions.map(qty =>
+          `<option value="${qty}">${qty}</option>`
+        ).join('');
+
+        const defaultPrice = quantityPrices[quantityOptions[0]] || 0;
+
+        categoryContainer.innerHTML += `
+          <div class="product-card">
+            <img src="${imageUrl}" alt="${name}">
+            <div class="product-info">
+              <div class="product-name">${name}</div>
+              <div class="product-price">
+                Total: $<span id="price-${itemId}">${defaultPrice.toFixed(2)}</span>
+              </div>
+              <select id="qty-${itemId}" onchange="updateManualPrice('${itemId}', ${JSON.stringify(quantityPrices).replace(/"/g, '&quot;')})">
+                ${optionsHTML}
+              </select>
+              <button onclick="addToCartWithQty('${name}', 0, '${imageUrl}')">Add to Cart</button>
+            </div>
+          </div>
+        `;
+      });
+    })
+    .catch((error) => {
+      console.error("Error loading gallery:", error);
+      galleryContainer.innerHTML = `<p style="text-align:center; color:red;">Error loading items. Please try again later.</p>`;
+    });
+
+  showSection('gallerySection');
+}
 
 
       const categoryContainer = document.getElementById(`gallery-${categoryFilter}`);
