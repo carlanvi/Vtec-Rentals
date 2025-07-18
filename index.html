@@ -1490,31 +1490,43 @@ html += `
 }
 
         // Add fixed-price item to cart (used by Bathroom, Cars, Thrill Rides)
-function addToCart(name, price, imageUrl) {
-  const qty = 1;
+function addToCartWithQty(name, _, imageUrl) {
+  const itemId = name.replace(/\s+/g, '-');
+  const qtyElement = document.getElementById(`qty-${itemId}`);
+  const priceElement = document.getElementById(`price-${itemId}`);
+
+  // ✅ Safety check
+  if (!qtyElement || !priceElement) {
+    console.error(`Missing quantity or price element for item: ${name}`);
+    return;
+  }
+
+  const qty = parseInt(qtyElement.value) || 1;
+  const totalPriceDisplayed = parseFloat(priceElement.textContent.replace(/,/g, ''));
+  const unitPrice = totalPriceDisplayed / qty;
   const days = 1;
-  const totalPrice = price * qty * days;
+  const totalPrice = unitPrice * qty * days;
 
   let cart = JSON.parse(localStorage.getItem('cart')) || [];
 
-  // 🔴 Prevent exact duplicate
+  // 🔴 Prevent exact duplicate with same quantity
   const duplicate = cart.find(item => item.name === name && item.quantity === qty);
   if (duplicate) {
     showToast("MAXIMUM AMOUNT REACHED", "error");
     return;
   }
 
-  // ✅ Update or add new item
+  // ✅ Update or push new item
   const existingItem = cart.find(item => item.name === name);
   if (existingItem) {
     existingItem.quantity = qty;
-    existingItem.price = price;
+    existingItem.price = unitPrice;
     existingItem.days = days;
     existingItem.totalPrice = totalPrice;
   } else {
     cart.push({
       name,
-      price,
+      price: unitPrice,
       imageUrl,
       quantity: qty,
       totalPrice,
