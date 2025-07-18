@@ -1464,10 +1464,19 @@ function deleteReview(docId) {
               </div>`;
         }
 
-        html += `
-              <button onclick="addToCartWithQty('${name}', 0, '${imageUrl}')">Add to Cart</button>
-            </div>
-          </div>`;
+        if (qtyMap[name]) {
+  html += `
+    <button onclick="addToCartWithQty('${name}', 0, '${imageUrl}')">Add to Cart</button>
+  `;
+} else {
+  html += `
+    <button onclick="addToCart('${name}', ${firebasePrice}, '${imageUrl}')">Add to Cart</button>
+  `;
+}
+
+html += `
+  </div>
+</div>`;
 
         categoryContainer.innerHTML += html;
       });
