@@ -1524,21 +1524,6 @@ function addToCartWithQty(name, _, imageUrl) {
   showToast("Added to cart", "success");
 }
 
-  const existingItem = cart.find(item => item.name === name);
-  if (existingItem) {
-    existingItem.quantity = qty;
-    existingItem.price = unitPrice;
-    existingItem.days = days;
-    existingItem.totalPrice = totalPrice;
-  } else {
-    cart.push({ name, price: unitPrice, imageUrl, quantity: qty, totalPrice, days });
-  }
-
-  localStorage.setItem('cart', JSON.stringify(cart));
-  updateCartCount();
-  showToast("Added to cart", "success");
-}
-
 // Update price when quantity is selected
 function updateManualPrice(itemId, priceMap) {
   const qty = document.getElementById(`qty-${itemId}`).value;
