@@ -252,27 +252,31 @@
     function addPhotoUrl() {
   const nameInput = document.getElementById('itemNameInput');
   const urlInput = document.getElementById('photoUrlInput');
+  const priceInput = document.getElementById('itemPriceInput'); // add this line
   const categorySelect = document.getElementById('photoCategorySelect');
 
   const name = nameInput.value.trim();
   const url = urlInput.value.trim();
+  const price = parseFloat(priceInput.value); // add this line
   const category = categorySelect.value.trim();
 
   // Validate all fields
-  if (name === '' || url === '' || category === '') {
-    alert('Please enter a name, valid image URL, and select a category.');
+  if (name === '' || url === '' || isNaN(price) || category === '') {
+    alert('Please enter a name, valid image URL, price, and select a category.');
     return;
   }
 
-  // Save to Firebase
+  // Save to Firebase (✅ add price)
   db.collection('gallery').add({
     name: name,
     url: url,
+    price: price,
     category: category
   })
   .then(() => {
     nameInput.value = '';
     urlInput.value = '';
+    priceInput.value = ''; // clear price input
     categorySelect.value = '';
     alert('Item added successfully!');
   })
@@ -281,7 +285,6 @@
     alert('Error adding item: ' + error.message);
   });
 }
-
 
     function loadGallery() {
       const galleryContainer = document.getElementById('adminGallery');
