@@ -1597,7 +1597,7 @@ function addToCart(name, price, imageUrl) {
 
       // ❌ Block if item exists and it's from a restricted category
       if (exists && isRestricted) {
-        showToast(`You can only add "${name}" once`, 'error');
+        showToast("YOU CAN ONLY ADD THIS ITEM ONCE", "error");
         return;
       }
 
@@ -1606,13 +1606,13 @@ function addToCart(name, price, imageUrl) {
         cart.push({ name, price, imageUrl, quantity: 1, category });
         localStorage.setItem('cart', JSON.stringify(cart));
         updateCartCount();
-        showToast(`Added "${name}" to cart`, "success");
+        showToast('ADDED TO CART', 'success');
       } else {
         // ✅ If not restricted, allow quantity to increase
         exists.quantity += 1;
         localStorage.setItem('cart', JSON.stringify(cart));
         updateCartCount();
-        showToast(`Updated quantity for "${name}"`, "success");
+        showToast("ADDED TO CART", "success");
       }
     });
 }
