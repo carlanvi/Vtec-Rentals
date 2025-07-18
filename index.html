@@ -1489,55 +1489,64 @@ html += `
   showSection('gallerySection');
 }
 
+  const restrictedCategories = ['BATHROOM', 'THRILL RIDES', 'CARS'];
+
         // Add fixed-price item to cart (used by Bathroom, Cars, Thrill Rides)
 function addToCartWithQty(name, _, imageUrl) {
   const itemId = name.replace(/\s+/g, '-');
   const qtyElement = document.getElementById(`qty-${itemId}`);
   const priceElement = document.getElementById(`price-${itemId}`);
 
-  // ✅ Safety check
-  if (!qtyElement || !priceElement) {
-    console.error(`Missing quantity or price element for item: ${name}`);
-    return;
-  }
+  if (!qtyElement || !priceElement) return;
 
   const qty = parseInt(qtyElement.value) || 1;
   const totalPriceDisplayed = parseFloat(priceElement.textContent.replace(/,/g, ''));
   const unitPrice = totalPriceDisplayed / qty;
   const days = 1;
-  const totalPrice = unitPrice * qty * days;
 
   let cart = JSON.parse(localStorage.getItem('cart')) || [];
 
-  // 🔴 Prevent exact duplicate with same quantity
-  const duplicate = cart.find(item => item.name === name && item.quantity === qty);
-  if (duplicate) {
-    showToast("MAXIMUM AMOUNT REACHED", "error");
-    return;
-  }
+  db.collection('gallery')
+    .where('name', '==', name)
+    .limit(1)
+    .get()
+    .then(snapshot => {
+      if (snapshot.empty) return;
 
-  // ✅ Update or push new item
-  const existingItem = cart.find(item => item.name === name);
-  if (existingItem) {
-    existingItem.quantity = qty;
-    existingItem.price = unitPrice;
-    existingItem.days = days;
-    existingItem.totalPrice = totalPrice;
-  } else {
-    cart.push({
-      name,
-      price: unitPrice,
-      imageUrl,
-      quantity: qty,
-      totalPrice,
-      days
+      const item = snapshot.docs[0].data();
+      const category = item.category || '';
+      const isRestricted = restrictedCategories.includes(category.toUpperCase());
+
+      const exists = cart.find(i => i.name === name);
+
+      if (exists && isRestricted) {
+        showToast(`Only one "${name}" allowed in cart`, 'error');
+        return;
+      }
+
+      if (exists) {
+        exists.quantity = qty;
+        exists.price = unitPrice;
+        exists.days = days;
+        exists.totalPrice = unitPrice * qty * days;
+      } else {
+        cart.push({
+          name,
+          price: unitPrice,
+          imageUrl,
+          quantity: qty,
+          totalPrice: unitPrice * qty * days,
+          days,
+          category
+        });
+      }
+
+      localStorage.setItem('cart', JSON.stringify(cart));
+      updateCartCount();
+      showToast(`Added "${name}" to cart`, "success");
     });
-  }
-
-  localStorage.setItem('cart', JSON.stringify(cart));
-  updateCartCount();
-  showToast(`Added "${name}" to cart`, "success");
 }
+
 
 
 // Update price when quantity is selected
