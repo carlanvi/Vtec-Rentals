@@ -1581,16 +1581,42 @@ function logoutUser() {
 // Add item to the cart
 function addToCart(name, price, imageUrl) {
   let cart = JSON.parse(localStorage.getItem('cart')) || [];
-  const existingItem = cart.find(item => item.name === name);
-  if (existingItem) {
-    existingItem.quantity += 1;
-  } else {
-    cart.push({ name, price, imageUrl, quantity: 1 });
-  }
-  localStorage.setItem('cart', JSON.stringify(cart));
-  updateCartCount();
-  showToast(`Added "${name}" to cart`, "success"); // ✅ This is what works
+
+  db.collection('gallery')
+    .where('name', '==', name)
+    .limit(1)
+    .get()
+    .then(snapshot => {
+      if (snapshot.empty) return;
+
+      const item = snapshot.docs[0].data();
+      const category = item.category || '';
+      const isRestricted = restrictedCategories.includes(category.toUpperCase());
+
+      const exists = cart.find(i => i.name === name);
+
+      // ❌ Block if item exists and it's from a restricted category
+      if (exists && isRestricted) {
+        showToast(`You can only add "${name}" once`, 'error');
+        return;
+      }
+
+      // ✅ Add new item
+      if (!exists) {
+        cart.push({ name, price, imageUrl, quantity: 1, category });
+        localStorage.setItem('cart', JSON.stringify(cart));
+        updateCartCount();
+        showToast(`Added "${name}" to cart`, "success");
+      } else {
+        // ✅ If not restricted, allow quantity to increase
+        exists.quantity += 1;
+        localStorage.setItem('cart', JSON.stringify(cart));
+        updateCartCount();
+        showToast(`Updated quantity for "${name}"`, "success");
+      }
+    });
 }
+
 
 // Update cart item count
 function updateCartCount() {
