@@ -1495,7 +1495,7 @@ function addToCartWithQty(name, _, imageUrl) {
   const qtyElement = document.getElementById(`qty-${itemId}`);
   const priceElement = document.getElementById(`price-${itemId}`);
 
-  // Safety check: elements exist
+  // ✅ Safety check
   if (!qtyElement || !priceElement) {
     console.error(`Missing quantity or price element for item: ${name}`);
     return;
@@ -1509,12 +1509,14 @@ function addToCartWithQty(name, _, imageUrl) {
 
   let cart = JSON.parse(localStorage.getItem('cart')) || [];
 
+  // 🔴 Prevent exact duplicate with same quantity
   const duplicate = cart.find(item => item.name === name && item.quantity === qty);
   if (duplicate) {
     showToast("MAXIMUM AMOUNT REACHED", "error");
     return;
   }
 
+  // ✅ Update or push new item
   const existingItem = cart.find(item => item.name === name);
   if (existingItem) {
     existingItem.quantity = qty;
@@ -1536,6 +1538,7 @@ function addToCartWithQty(name, _, imageUrl) {
   updateCartCount();
   showToast(`Added "${name}" to cart`, "success");
 }
+
 
 // Update price when quantity is selected
 function updateManualPrice(itemId, priceMap) {
