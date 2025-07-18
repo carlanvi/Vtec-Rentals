@@ -1480,37 +1480,38 @@ function deleteReview(docId) {
   showSection('gallerySection');
 }
 
-    
-  function addToCartWithQty(name, qty = 1, imageUrl = '', directPrice = null) {
-    const itemId = name.replace(/\s+/g, '-');
-    let price = 0;
+        // Add item to cart with selected quantity
+function addToCartWithQty(name, _, imageUrl) {
+  const itemId = name.replace(/\s+/g, '-');
+  const qty = parseInt(document.getElementById(`qty-${itemId}`).value) || 1;
 
-    if (typeof qtyMap !== 'undefined' && qtyMap[name]) {
-      const prices = qtyMap[name].prices;
-      price = prices[qty] || 0;
-    } else if (directPrice !== null) {
-      price = directPrice;
-    } else {
-      const priceSpan = document.getElementById(`price-${itemId}`);
-      if (priceSpan) {
-        price = parseFloat(priceSpan.textContent) || 0;
-      }
-    }
+  const totalPriceDisplayed = parseFloat(document.getElementById(`price-${itemId}`).textContent.replace(/,/g, ''));
+  const unitPrice = totalPriceDisplayed / qty; // ✅ FIXED: Get price per unit
+  const days = 1;
+  const totalPrice = unitPrice * qty * days;
 
-    const cartItem = {
-      name,
-      quantity: qty,
-      imageUrl,
-      price,
-      total: price * qty
-    };
+  let cart = JSON.parse(localStorage.getItem('cart')) || [];
 
-    let cart = JSON.parse(localStorage.getItem('cart')) || [];
-    cart.push(cartItem);
-    localStorage.setItem('cart', JSON.stringify(cart));
-
-    alert(`${name} added to cart!`);
+  const duplicate = cart.find(item => item.name === name && item.quantity === qty);
+  if (duplicate) {
+    showToast("MAXIMUM AMOUNT REACHED", "error");
+    return;
   }
+
+  const existingItem = cart.find(item => item.name === name);
+  if (existingItem) {
+    existingItem.quantity = qty;
+    existingItem.price = unitPrice;
+    existingItem.days = days;
+    existingItem.totalPrice = totalPrice;
+  } else {
+    cart.push({ name, price: unitPrice, imageUrl, quantity: qty, totalPrice, days });
+  }
+
+  localStorage.setItem('cart', JSON.stringify(cart));
+  updateCartCount();
+  showToast("Added to cart", "success");
+}
 
 // Update price when quantity is selected
 function updateManualPrice(itemId, priceMap) {
