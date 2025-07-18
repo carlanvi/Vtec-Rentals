@@ -1475,51 +1475,7 @@ function deleteReview(docId) {
   showSection('gallerySection');
 }
 
-
-      const categoryContainer = document.getElementById(`gallery-${categoryFilter}`);
-
-      querySnapshot.forEach((doc) => {
-        const data = doc.data();
-        const imageUrl = data.url;
-        const name = data.name || 'Unnamed';
-        const itemId = name.replace(/\s+/g, '-');
-
-        let quantityOptions = [1];
-        let quantityPrices = { 1: data.price || 0 };
-
-        if (qtyMap[name]) {
-          quantityOptions = qtyMap[name].options;
-          quantityPrices = qtyMap[name].prices;
-        }
-
-        const optionsHTML = quantityOptions.map(qty =>
-          `<option value="${qty}">${qty}</option>`
-        ).join('');
-
-        categoryContainer.innerHTML += `
-          <div class="product-card">
-            <img src="${imageUrl}" alt="${name}">
-            <div class="product-info">
-              <div class="product-name">${name}</div>
-              <div class="product-price">
-                Total: $<span id="price-${itemId}">${quantityPrices[quantityOptions[0]].toFixed(2)}</span>
-              </div>
-              <select id="qty-${itemId}" onchange="updateManualPrice('${itemId}', ${JSON.stringify(quantityPrices).replace(/"/g, '&quot;')})">
-                ${optionsHTML}
-              </select>
-              <button onclick="addToCartWithQty('${name}', 0, '${imageUrl}')">Add to Cart</button>
-            </div>
-          </div>
-        `;
-      });
-    })
-    .catch((error) => {
-      console.error("Error loading gallery:", error);
-    });
-
-  showSection('gallerySection');
-}
-
+    
     // Add item to cart with selected quantity
 function addToCartWithQty(name, _, imageUrl) {
   const itemId = name.replace(/\s+/g, '-');
