@@ -1489,44 +1489,32 @@ html += `
   showSection('gallerySection');
 }
 
-        // Add item to cart with selected quantity
-function addToCartWithQty(name, _, imageUrl) {
-  const itemId = name.replace(/\s+/g, '-');
-  const qtyElement = document.getElementById(`qty-${itemId}`);
-  const priceElement = document.getElementById(`price-${itemId}`);
-
-  // ✅ Safety check
-  if (!qtyElement || !priceElement) {
-    console.error(`Missing quantity or price element for item: ${name}`);
-    return;
-  }
-
-  const qty = parseInt(qtyElement.value) || 1;
-  const totalPriceDisplayed = parseFloat(priceElement.textContent.replace(/,/g, ''));
-  const unitPrice = totalPriceDisplayed / qty;
+        // Add fixed-price item to cart (used by Bathroom, Cars, Thrill Rides)
+function addToCart(name, price, imageUrl) {
+  const qty = 1;
   const days = 1;
-  const totalPrice = unitPrice * qty * days;
+  const totalPrice = price * qty * days;
 
   let cart = JSON.parse(localStorage.getItem('cart')) || [];
 
-  // 🔴 Prevent exact duplicate with same quantity
+  // 🔴 Prevent exact duplicate
   const duplicate = cart.find(item => item.name === name && item.quantity === qty);
   if (duplicate) {
     showToast("MAXIMUM AMOUNT REACHED", "error");
     return;
   }
 
-  // ✅ Update or push new item
+  // ✅ Update or add new item
   const existingItem = cart.find(item => item.name === name);
   if (existingItem) {
     existingItem.quantity = qty;
-    existingItem.price = unitPrice;
+    existingItem.price = price;
     existingItem.days = days;
     existingItem.totalPrice = totalPrice;
   } else {
     cart.push({
       name,
-      price: unitPrice,
+      price,
       imageUrl,
       quantity: qty,
       totalPrice,
