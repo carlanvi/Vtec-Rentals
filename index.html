@@ -1520,7 +1520,7 @@ function addToCartWithQty(name, _, imageUrl) {
       const exists = cart.find(i => i.name === name);
 
       if (exists && isRestricted) {
-        showToast(`Only one "${name}" allowed in cart`, 'error');
+        showToast("YOU CAN ONLY ADD THIS ITEM ONCE", "error");
         return;
       }
 
@@ -1543,7 +1543,7 @@ function addToCartWithQty(name, _, imageUrl) {
 
       localStorage.setItem('cart', JSON.stringify(cart));
       updateCartCount();
-      showToast(`Added "${name}" to cart`, "success");
+      showToast("ADDED TO CART", "success");
     });
 }
 
